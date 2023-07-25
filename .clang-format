@@ -1,0 +1,15 @@
+BasedOnStyle: Chromium
+AlignConsecutiveMacros: 'true'
+AllowShortCaseLabelsOnASingleLine: 'false'
+AllowShortFunctionsOnASingleLine: None
+IndentCaseLabels: 'true'
+BitFieldColonSpacing: After
+AlwaysBreakBeforeMultilineStrings: 'false'
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortBlocksOnASingleLine: 'true'
+AllowShortLoopsOnASingleLine: 'true'
+Cpp11BracedListStyle: 'false'
+DerivePointerAlignment: 'false'
+IncludeBlocks: Merge
+QualifierAlignment: Right
+UseTab: Never
