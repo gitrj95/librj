@@ -8,6 +8,7 @@ AlwaysBreakBeforeMultilineStrings: 'false'
 AllowShortIfStatementsOnASingleLine: WithoutElse
 AllowShortBlocksOnASingleLine: 'true'
 AllowShortLoopsOnASingleLine: 'true'
+AllowShortEnumsOnASingleLine: 'false'
 Cpp11BracedListStyle: 'false'
 DerivePointerAlignment: 'false'
 IncludeBlocks: Merge
