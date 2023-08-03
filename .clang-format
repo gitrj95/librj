@@ -1,12 +1,10 @@
 BasedOnStyle: Google
+IncludeBlocks: Merge
 AlignConsecutiveMacros: 'true'
-AllowShortFunctionsOnASingleLine: None
-BitFieldColonSpacing: After
-AlwaysBreakBeforeMultilineStrings: 'false'
 AllowShortBlocksOnASingleLine: 'true'
 AllowShortEnumsOnASingleLine: 'false'
-Cpp11BracedListStyle: 'false'
+AllowShortFunctionsOnASingleLine: None
+AlwaysBreakBeforeMultilineStrings: 'false'
 DerivePointerAlignment: 'false'
 PointerAlignment: Right
-IncludeBlocks: Merge
 QualifierAlignment: Right
