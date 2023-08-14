@@ -2,7 +2,6 @@ BasedOnStyle: Google
 IncludeBlocks: Merge
 AlignConsecutiveMacros: 'true'
 AllowShortBlocksOnASingleLine: 'true'
-AllowShortEnumsOnASingleLine: 'false'
 AllowShortFunctionsOnASingleLine: None
 AlwaysBreakBeforeMultilineStrings: 'false'
 DerivePointerAlignment: 'false'
