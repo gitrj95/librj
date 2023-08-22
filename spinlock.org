@@ -1,0 +1,20 @@
+* optimized spinlock
+** why not posix spinlock, etc
+this has tricks that the posix, etc spinlock does not
+** why not using =atomic_flag= with =test_and_set=, etc
+- rmw is expensive. it requires a "lock" on the cache line--however
+  that is implemented (eg mesi)
+- atomic loads are cheap
+- cheap || expensive -> we don't lock-up the cache line with rmw as
+  frequently. we may spuriously hit the expensive part if another
+  thread slips between the left and right halves of the ||, but this
+  is clearly less often
+** why not compare exchange
+- we have two states. wlog, these can just be 1 and 0
+- regardless whether compare exchange is backed by ll/sc or cas, it'll
+  be less cheap than the above
+** ~if(WHAT == i)~
+- if we busy spin, the scheduler will be like: whoa, this task is
+  doing so much! let's give it more time slices!
+- we don't want this. unhappily, support for nanosleep seems more
+  prevalent than c11 threads, so...
