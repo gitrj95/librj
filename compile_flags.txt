@@ -1,0 +1,8 @@
+-std=c2x
+-Wall
+-Wextra
+-Werror
+-Wconversion
+-Wcast-qual
+-Wvla
+-pedantic
