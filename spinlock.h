@@ -6,9 +6,9 @@
 
 #define SPINLOCK_INIT 0
 
-typedef atomic_int spinlock_t;
+typedef atomic_int spinlock;
 
-static inline void spin_lock(spinlock_t *lock) {
+static inline void spin_lock(spinlock *lock) {
   for (int i = 0; atomic_load_explicit(lock, memory_order_acquire) ||
                   atomic_exchange_explicit(lock, 1, memory_order_acquire);
        i++) {
@@ -20,7 +20,7 @@ static inline void spin_lock(spinlock_t *lock) {
   }
 }
 
-static inline void spin_unlock(spinlock_t *lock) {
+static inline void spin_unlock(spinlock *lock) {
   atomic_store_explicit(lock, 0, memory_order_release);
 }
 
