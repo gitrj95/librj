@@ -11,7 +11,7 @@ typedef atomic_int spinlock;
 static inline void spin_lock(spinlock *lock) {
   for (int i = 0; atomic_load_explicit(lock, memory_order_acquire) ||
                   atomic_exchange_explicit(lock, 1, memory_order_acquire);
-       i++) {
+       ++i) {
     if (8 == i) {
       static struct timespec ts = {.tv_sec = 0, .tv_nsec = 1};
       nanosleep(&ts, 0);
