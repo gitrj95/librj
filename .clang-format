@@ -1,7 +1,7 @@
 BasedOnStyle: Google
 IncludeBlocks: Merge
-AllowShortBlocksOnASingleLine: 'true'
-AllowShortFunctionsOnASingleLine: None
+AllowShortBlocksOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: Empty
 AlwaysBreakBeforeMultilineStrings: 'false'
 DerivePointerAlignment: 'false'
 PointerAlignment: Right
