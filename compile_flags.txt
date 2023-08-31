@@ -2,6 +2,7 @@
 -Wall
 -Wextra
 -Wconversion
+-Wno-sign-conversion
 -Wcast-qual
 -Wvla
 -Wpedantic
