@@ -3,6 +3,7 @@
 -Wextra
 -Wconversion
 -Wno-sign-conversion
+-Wdouble-promotion
 -Wcast-qual
 -Wvla
 -Wpedantic
