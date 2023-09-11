@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <string.h>
 
-void spscqueue_init(spscqueue *q, void *hd, void *tl, long item_len) {
+void spscqueue_init(spscqueue *restrict q, void *hd, void *tl, long item_len) {
   assert(q && "`q` is null.");
   assert(hd && "`hd` is null.");
   assert(tl && "`tl` is null.");
@@ -24,7 +24,7 @@ void spscqueue_init(spscqueue *q, void *hd, void *tl, long item_len) {
 #undef HD
 }
 
-bool spscqueue_write(spscqueue *q, void *p) {
+bool spscqueue_write(spscqueue *restrict q, void *restrict p) {
   assert(q && "`q` is null.");
   assert(p && "`p` is null.");
   char *wp = (char *)atomic_load_explicit(&q->w, memory_order_relaxed);

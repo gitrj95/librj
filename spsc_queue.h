@@ -25,8 +25,8 @@ typedef struct {
   alignas(CACHE_BLOCK_BYTES) intptr_t writerr;
 } spscqueue;
 
-void spscqueue_init(spscqueue *q, void *hd, void *tl, long item_len);
-bool spscqueue_write(spscqueue *q, void *p);
+void spscqueue_init(spscqueue *restrict q, void *hd, void *tl, long item_len);
+bool spscqueue_write(spscqueue *restrict q, void *restrict p);
 void *spscqueue_read(spscqueue *q);
 
 #endif
