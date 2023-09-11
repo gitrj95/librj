@@ -1,4 +1,4 @@
-#include "spsc_queue.h"
+#include "spscqueue.h"
 #include <assert.h>
 #include <stdatomic.h>
 #include <stdbool.h>
@@ -6,13 +6,12 @@
 #include <string.h>
 
 void spscqueue_init(spscqueue *restrict q, void *hd, void *tl, long item_len) {
-  assert(q && "`q` is null.");
-  assert(hd && "`hd` is null.");
-  assert(tl && "`tl` is null.");
-  assert((char *)hd < (char *)tl && "`hd` >= `tl`.");
-  assert(item_len > 0 && "`item_len` <= 0.");
-  assert(!(((char *)tl - (char *)hd) % item_len) &&
-         "`hd - tl` is not a multiple of `item_len`.");
+  assert(q);
+  assert(hd);
+  assert(tl);
+  assert((char *)hd < (char *)tl);
+  assert(item_len > 0);
+  assert(!(((char *)tl - (char *)hd) % item_len));
 #define HD (intptr_t)(hd)
   *q = (spscqueue){.item_len = item_len,
                    .hd = hd,
@@ -24,9 +23,9 @@ void spscqueue_init(spscqueue *restrict q, void *hd, void *tl, long item_len) {
 #undef HD
 }
 
-bool spscqueue_write(spscqueue *restrict q, void *restrict p) {
-  assert(q && "`q` is null.");
-  assert(p && "`p` is null.");
+bool spscqueue_push(spscqueue *restrict q, void *restrict p) {
+  assert(q);
+  assert(p);
   char *wp = (char *)atomic_load_explicit(&q->w, memory_order_relaxed);
   char *next_wp = wp + q->item_len;
   if (next_wp == q->tl) next_wp = q->hd;
@@ -39,8 +38,8 @@ bool spscqueue_write(spscqueue *restrict q, void *restrict p) {
   return 1;
 }
 
-void *spscqueue_read(spscqueue *q) {
-  assert(q && "`q` is null.");
+void const *spscqueue_pop(spscqueue *q) {
+  assert(q);
   char *rp = (char *)atomic_load_explicit(&q->r, memory_order_relaxed);
   if (rp == (char *)q->readerw) {
     q->readerw = atomic_load_explicit(&q->w, memory_order_acquire);

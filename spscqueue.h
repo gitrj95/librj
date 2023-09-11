@@ -1,5 +1,5 @@
-#ifndef SPSC_QUEUE_H
-#define SPSC_QUEUE_H
+#ifndef SPSCQUEUE_H
+#define SPSCQUEUE_H
 
 #include <stdalign.h>
 #include <stdatomic.h>
@@ -19,14 +19,12 @@
 typedef struct {
   long item_len;
   void *hd, *tl;
-  alignas(CACHE_BLOCK_BYTES) atomic_intptr_t w;
-  alignas(CACHE_BLOCK_BYTES) atomic_intptr_t r;
-  alignas(CACHE_BLOCK_BYTES) intptr_t readerw;
-  alignas(CACHE_BLOCK_BYTES) intptr_t writerr;
+  alignas(CACHE_BLOCK_BYTES) atomic_intptr_t w, r;
+  alignas(CACHE_BLOCK_BYTES) intptr_t readerw, writerr;
 } spscqueue;
 
 void spscqueue_init(spscqueue *restrict q, void *hd, void *tl, long item_len);
-bool spscqueue_write(spscqueue *restrict q, void *restrict p);
-void *spscqueue_read(spscqueue *q);
+bool spscqueue_push(spscqueue *restrict q, void *restrict p);
+void const *spscqueue_pop(spscqueue *q);
 
 #endif
