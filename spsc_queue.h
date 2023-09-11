@@ -6,7 +6,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifndef CACHE_BLOCK_BYTES
 #define CACHE_BLOCK_BYTES 64
+#endif
 
 #define spscqueue_init_from_static(qp, a)                   \
   do {                                                      \

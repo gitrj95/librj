@@ -10,7 +10,7 @@
 typedef atomic_int spinlock;
 
 static inline void spin_lock(spinlock *lock) {
-  assert(lock && "Spinlock assumed non-null.");
+  assert(lock && "`lock` is null.");
   for (int i = 0; atomic_load_explicit(lock, memory_order_acquire) ||
                   atomic_exchange_explicit(lock, 1, memory_order_acquire);
        ++i) {
@@ -23,7 +23,7 @@ static inline void spin_lock(spinlock *lock) {
 }
 
 static inline void spin_unlock(spinlock *lock) {
-  assert(lock && "Spinlock assumed non-null.");
+  assert(lock && "`lock` is null.");
   atomic_store_explicit(lock, 0, memory_order_release);
 }
 
