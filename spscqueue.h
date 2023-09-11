@@ -24,7 +24,17 @@ typedef struct {
 } spscqueue;
 
 void spscqueue_init(spscqueue *restrict q, void *hd, void *tl, long item_len);
-bool spscqueue_push(spscqueue *restrict q, void *restrict p);
-void const *spscqueue_pop(spscqueue *q);
+bool spscqueue_trypush(spscqueue *restrict q, void *restrict p);
+void const *spscqueue_trypop(spscqueue *q);
+
+static inline void spscqueue_push(spscqueue *restrict q, void *restrict p) {
+  while (!spscqueue_trypush(q, p)) {}
+}
+
+static inline void const *spscqueue_pop(spscqueue *q) {
+  void const *p;
+  while (!(p = spscqueue_trypop(q))) {}
+  return p;
+}
 
 #endif
