@@ -23,7 +23,7 @@ void spscqueue_init(spscqueue *restrict q, void *hd, void *tl, long item_len) {
 #undef HD
 }
 
-bool spscqueue_trypush(spscqueue *restrict q, void *restrict p) {
+bool spscqueue_trypush(spscqueue *restrict q, void const *restrict p) {
   assert(q);
   assert(p);
   char *wp = (char *)atomic_load_explicit(&q->w, memory_order_relaxed);

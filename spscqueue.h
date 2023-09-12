@@ -24,10 +24,11 @@ typedef struct {
 } spscqueue;
 
 void spscqueue_init(spscqueue *restrict q, void *hd, void *tl, long item_len);
-bool spscqueue_trypush(spscqueue *restrict q, void *restrict p);
+bool spscqueue_trypush(spscqueue *restrict q, void const *restrict p);
 void const *spscqueue_trypop(spscqueue *q);
 
-static inline void spscqueue_push(spscqueue *restrict q, void *restrict p) {
+static inline void spscqueue_push(spscqueue *restrict q,
+                                  void const *restrict p) {
   while (!spscqueue_trypush(q, p)) {}
 }
 
