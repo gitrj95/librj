@@ -12,6 +12,7 @@ void spscqueue_init(spscqueue *restrict q, void *hd, void *tl, long item_len) {
   assert((char *)hd < (char *)tl);
   assert(item_len > 0);
   assert(!(((char *)tl - (char *)hd) % item_len));
+  assert(1 < ((char *)tl - (char *)hd) / item_len);
 #define HD (intptr_t)(hd)
   *q = (spscqueue){.item_len = item_len,
                    .hd = hd,
