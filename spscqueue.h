@@ -53,8 +53,7 @@ consumer. If we need to reload the cached copy with the atomic writer
 pointer, at that point, we must load with acquire semantics to
 guarantee initialized memory of the cells between our cached copy and
 the update with the true value. The consumer will never advance ahead
-of the producer by the same argument, so stale writes are never read
-and fresh writes are not overwritten.
+of the producer by the same argument.
 
 Do we need any other barriers despite synchronization with multiple
 atomics? Actually, no. Intuitively, the consumer is not trying to make
@@ -88,10 +87,11 @@ other".
 #define CACHE_BLOCK_BYTES 64
 #endif
 
-#define spscqueue_init_from_static(qp, a)                   \
-  do {                                                      \
-    size_t len__ = sizeof(a) / sizeof((a)[0]);              \
-    spscqueue_init((qp), (a), (a) + len__, sizeof((a)[0])); \
+#define spscqueue_init_from_static(qp, a)                           \
+  do {                                                              \
+    size_t len__ = sizeof(a) / sizeof((a)[0]);                      \
+    typeof(&a[0]) a_dcy__ = (a);                                    \
+    spscqueue_init((qp), a_dcy__, a_dcy__ + len__, sizeof((a)[0])); \
   } while (0)
 
 typedef struct {
