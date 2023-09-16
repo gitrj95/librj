@@ -29,7 +29,7 @@ disambiguate empty cells.
 static inline int32_t msi_next(int exp, uint64_t hash, int32_t i);
 
 static inline int32_t msi_init(int exp, uint64_t hash) {
-  return msi_next(exp, hash, hash & 0xcfffffff);
+  return msi_next(exp, hash, hash & 0x3fffffff);
 }
 
 static inline int32_t msi_next(int exp, uint64_t hash, int32_t i) {

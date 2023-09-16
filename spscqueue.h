@@ -89,13 +89,13 @@ other".
 
 #define spscqueue_init_from_static(qp, a)                           \
   do {                                                              \
-    size_t len__ = sizeof(a) / sizeof((a)[0]);                      \
+    size_t sz__ = sizeof(a) / sizeof((a)[0]);                      \
     typeof(&a[0]) a_dcy__ = (a);                                    \
-    spscqueue_init((qp), a_dcy__, a_dcy__ + len__, sizeof((a)[0])); \
+    spscqueue_init((qp), a_dcy__, a_dcy__ + sz__, sizeof((a)[0])); \
   } while (0)
 
 typedef struct {
-  long item_len;
+  long itemsz;
   void *hd, *tl;
   alignas(CACHE_BLOCK_BYTES) atomic_intptr_t w, r;
   alignas(CACHE_BLOCK_BYTES) intptr_t readerw, writerr;
