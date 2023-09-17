@@ -1,14 +1,14 @@
 /*
-This is an implementation of an optimized spinlock. To avoid paying
-the penalty for a RMW on each spin, we do a load first and only
-attempt a write if the load works i.e. the lock appears
-unlocked. There is no need to do any atomic comparisons, here, given
-we have two states (0 or 1 WLOG). The nanosleep is a heuristic hack
-sourced from Fedor Pikus. Without the sleep, the OS would think that
-the waiter of a lock is doing lots of work, so it would give it more
-time slices erroneously. The nanosleep with the pursuant magic numbers
-deals with this in practice on modern x86 machines and is more
-portable than threads.h.
+  This is an implementation of an optimized spinlock. To avoid paying
+  the penalty for a RMW on each spin, we do a load first and only
+  attempt a write if the load works i.e. the lock appears
+  unlocked. There is no need to do any atomic comparisons, here, given
+  we have two states (0 or 1 WLOG). The nanosleep is a heuristic hack
+  sourced from Fedor Pikus. Without the sleep, the OS would think that
+  the waiter of a lock is doing lots of work, so it would give it more
+  time slices erroneously. The nanosleep with the pursuant magic
+  numbers deals with this in practice on modern x86 machines and is
+  more portable than threads.h.
 */
 
 #ifndef SPINLOCK_H
