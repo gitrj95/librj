@@ -4,8 +4,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
+#include "ssize.h"
 
-void spscqueue_init(spscqueue *restrict q, void *hd, void *tl, long itemsz) {
+void spscqueue_init(spscqueue *restrict q, void *hd, void *tl, ssize itemsz) {
   assert(q);
   assert(hd);
   assert(tl);
@@ -13,7 +14,7 @@ void spscqueue_init(spscqueue *restrict q, void *hd, void *tl, long itemsz) {
   assert(itemsz > 0);
   assert(!(((char *)tl - (char *)hd) % itemsz));
   assert(1 < ((char *)tl - (char *)hd) / itemsz);
-#define HD (intptr_t)(hd)
+#define HD ((intptr_t)(hd))
   *q = (spscqueue){.itemsz = itemsz,
                    .hd = hd,
                    .tl = tl,
@@ -27,12 +28,14 @@ void spscqueue_init(spscqueue *restrict q, void *hd, void *tl, long itemsz) {
 bool spscqueue_trypush(spscqueue *restrict q, void const *restrict p) {
   assert(q);
   assert(p);
-  char *wp = (char *)atomic_load_explicit(&q->w, memory_order_relaxed);
+#define C(x) ((char *)(x))
+  char *wp = C(atomic_load_explicit(&q->w, memory_order_relaxed));
   char *next_wp = wp + q->itemsz;
   if (next_wp == q->tl) next_wp = q->hd;
-  if (next_wp == (char *)q->writerr) {
+  if (next_wp == C(q->writerr)) {
     q->writerr = atomic_load_explicit(&q->r, memory_order_relaxed);
-    if (next_wp == (char *)q->writerr) return 0;
+    if (next_wp == C(q->writerr)) return 0;
+#undef C
   }
   memcpy(wp, p, q->itemsz);
   atomic_store_explicit(&q->w, (intptr_t)next_wp, memory_order_release);
@@ -41,10 +44,12 @@ bool spscqueue_trypush(spscqueue *restrict q, void const *restrict p) {
 
 void const *spscqueue_trypop(spscqueue *q) {
   assert(q);
-  char *rp = (char *)atomic_load_explicit(&q->r, memory_order_relaxed);
-  if (rp == (char *)q->readerw) {
+#define C(x) ((char *)(x))
+  char *rp = C(atomic_load_explicit(&q->r, memory_order_relaxed));
+  if (rp == C(q->readerw)) {
     q->readerw = atomic_load_explicit(&q->w, memory_order_acquire);
-    if (rp == (char *)q->readerw) return 0;
+    if (rp == C(q->readerw)) return 0;
+#undef C
   }
   char *next_rp = rp + q->itemsz;
   if (next_rp == q->tl) next_rp = q->hd;
