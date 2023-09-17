@@ -89,10 +89,10 @@
 #define CACHE_BLOCK_BYTES 64
 #endif
 
-#define spscqueue_init_from_static(qp, a)                           \
-  do {                                                              \
+#define spscqueue_init_from_static(qp, a)                          \
+  do {                                                             \
     size_t sz__ = sizeof(a) / sizeof((a)[0]);                      \
-    typeof(&a[0]) a_dcy__ = (a);                                    \
+    typeof(&a[0]) a_dcy__ = (a);                                   \
     spscqueue_init((qp), a_dcy__, a_dcy__ + sz__, sizeof((a)[0])); \
   } while (0)
 
