@@ -10,19 +10,23 @@ void spscqueue_init(spscqueue *restrict q, void *hd, void *tl, ssize itemsz) {
   assert(q);
   assert(hd);
   assert(tl);
-  assert((char *)hd < (char *)tl);
+#define HD ((char *)hd)
+#define TL ((char *)tl)
+  assert(HD < TL);
   assert(itemsz > 0);
-  assert(!(((char *)tl - (char *)hd) % itemsz));
-  assert(1 < ((char *)tl - (char *)hd) / itemsz);
-#define HD ((intptr_t)(hd))
+  assert(!((TL - HD) % itemsz));
+  assert(1 < (TL - HD) / itemsz);
+#undef TL
+#undef HD
+#define I(x) ((intptr_t)(x))
   *q = (spscqueue){.itemsz = itemsz,
                    .hd = hd,
                    .tl = tl,
-                   .w = HD,
-                   .r = HD,
-                   .readerw = HD,
-                   .writerr = HD};
-#undef HD
+                   .w = I(hd),
+                   .r = I(hd),
+                   .readerw = I(hd),
+                   .writerr = I(hd)};
+#undef I
 }
 
 bool spscqueue_trypush(spscqueue *restrict q, void const *restrict p) {
