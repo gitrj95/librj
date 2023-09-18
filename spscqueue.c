@@ -1,9 +1,9 @@
 #include "spscqueue.h"
-#include <assert.h>
 #include <stdatomic.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
+#include "assert.h"
 #include "ssize.h"
 
 void spscqueue_init(spscqueue *restrict q, void *hd, void *tl, ssize itemsz) {

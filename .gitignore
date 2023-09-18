@@ -1,2 +1,11 @@
 *~
 *#
+
+bin/*
+!bin/.gitkeep
+
+test/*
+!test/makefile
+!test/*.c
+!test/*.h
+
