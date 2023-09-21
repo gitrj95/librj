@@ -1,3 +1,23 @@
+/*
+  A KISS unit-testing helper header. Its semantics can be trivially
+  gleaned from examples, but there are several things to note. One,
+  the `expect` commands write to stdout on pass/fail. Two, the
+  pass/fail writes use `printf`; namely, they are not
+  re-entrant. Three, `expect_abort` works by unwinding the stack when
+  a SIGABRT is hit--e.g., via `assert`.
+
+  Notably, there's no mocking support here, because mocking in C is
+  complicated to generally implement, and any such solution I know of
+  imposes restrictions on the mockable functions or exploits
+  non-trivial details of the toolchain/runtime. Examples: 1) poisoning
+  global offset table 2) textual replacement via unity build and some
+  statically known, global notion of mockable functions 3) weak
+  symbols via the linker, etc.
+
+  Therefore, if mocking is required, I think a non-generic solution
+  for the specific context is more useful.
+*/
+
 #ifndef TEST_H
 #define TEST_H
 
