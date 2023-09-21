@@ -4,7 +4,7 @@
 CC = cc
 STD = gnu2x # typeof operators not in gcc/clang yet for C23
 NCOLOR = 0 # pass through
-CFLAGS = -std=$(STD) -Wall -Wextra -Wconversion -Wno-sign-conversion -Wdouble-promotion -Wcast-qual -Wvla -Werror -O3 -DNDEBUG -flto
+CFLAGS = -std=$(STD) -Wall -Wextra -Wconversion -Wno-sign-conversion -Wdouble-promotion -Wcast-qual -Wvla -Werror -O3 -DNDEBUG -flto -march=native
 ARFLAGS = -rcs
 
 all: check bin/librj.a
@@ -24,5 +24,3 @@ bin/posix_arena.o: posix_arena.c arena.h ssize.h
 
 bin/spscqueue.o: spscqueue.c spscqueue.h ssize.h
 	$(CC) -o $@ $(CFLAGS) -c $<
-
-
