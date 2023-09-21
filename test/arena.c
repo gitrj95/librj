@@ -55,8 +55,30 @@ void alloc(void) {
   expect_abort(linalloc(ap, 10, 123));
 }
 
+void reset(void) {
+  test();
+  arena *ap = arena_create(123);
+  struct fat {
+    int a[1000];
+  };
+  struct fat *f = LINALLOC(ap, struct fat);
+  expect_true(!f);
+  arena_reset(ap);
+  expect_true(ap->p == ap->tl);
+  struct thin {
+    int a[2];
+  };
+  struct thin *t = LINALLOC(ap, struct thin);
+  expect_true(t);
+  *t = (struct thin){{3, 4}};
+  expect_true(t->a[0] == 3);
+  expect_true(t->a[1] == 4);
+  expect_abort(arena_reset(0));
+}
+
 int main(void) {
   suite();
   createndestroy();
   alloc();
+  reset();
 }

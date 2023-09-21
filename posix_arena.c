@@ -46,10 +46,17 @@ void *linalloc(struct arena *a, ssize itemsz, int32_t align) {
   assert(a);
   assert(0 < itemsz);
   assert(-1 < align);
-  assert(!(align & (align - 1))); /* `align` == 0 is ok */
+  assert(!(align & (align - 1)));
   uintptr_t addr = (uintptr_t)a->p;
   addr -= itemsz;
   addr = addr & ~(align - 1); /* need sign extension */
-  a->p = addr < (uintptr_t)a->hd ? 0 : (char *)addr;
+  a->p = addr < (uintptr_t)a->hd
+             ? 0
+             : (char *)addr; /* trade backtracking capability for cmov */
   return a->p;
+}
+
+void arena_reset(arena *a) {
+  assert(a);
+  a->p = a->tl;
 }
