@@ -11,9 +11,6 @@
 #include <sys/mman.h>
 #include "arena.h"
 #include "ssize.h"
-#include <assert.h>
-
-#define unlikely(x) __builtin_expect(!!(x), 0)
 
 struct arena {
   char *hd, *tl, *p;
@@ -53,7 +50,6 @@ void *linalloc(struct arena *a, ssize itemsz, int32_t align) {
   uintptr_t addr = (uintptr_t)a->p;
   addr -= itemsz;
   addr = addr & ~(align - 1); /* need sign extension */
-  if (unlikely(addr < (uintptr_t)a->hd)) return 0;
-  a->p = (char *)addr;
+  a->p = addr < (uintptr_t)a->hd ? 0 : (char *)addr;
   return a->p;
 }
