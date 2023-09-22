@@ -12,7 +12,7 @@ TSAN = -fsanitize=thread
 CFLAGS = -std=$(STD) -Wall -Wextra -Wconversion -Wno-sign-conversion -Wdouble-promotion -Wcast-qual -Wvla -Werror -O0 -fpie -g3 -DNCOLOR=$(NCOLOR)
 LDFLAGS = -Wl,-pie
 
-check: test_arena test_spscqueue test_spinlock
+check: test_arena test_spscqueue test_spinlock test_msi
 
 test_arena: arena
 	@$(DELIM)
@@ -50,3 +50,10 @@ spinlock_tsan: spinlock.c .FORCE
 spinlock_asan: spinlock.c .FORCE
 	$(CC) -o $@ $(CFLAGS) $(ASAN) $(UBSAN) $< $(LDFLAGS) -lpthread
 
+test_msi: msi
+	@$(DELIM)
+	@./msi
+	@$(DELIM)
+
+msi: msi.c .FORCE
+	$(CC) -o $@ $(CFLAGS) $(ASAN) $(UBSAN) $< $(LDFLAGS)
