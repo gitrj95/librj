@@ -41,7 +41,7 @@ int arena_destroy(struct arena **a) {
   return 0;
 }
 
-void *linalloc(struct arena *a, ssize itemsz, int32_t align) {
+void *linalloc_explicit(struct arena *a, ssize itemsz, int32_t align) {
   static_assert(sizeof(uintptr_t) >= sizeof(uint32_t));
   assert(a);
   assert(0 < itemsz);

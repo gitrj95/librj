@@ -14,13 +14,13 @@
 #include <stdint.h>
 #include "ssize.h"
 
-#define LINALLOC(ap, T) (T *)(linalloc((ap), sizeof(T), alignof(T)))
+#define linalloc(ap, T) (T *)(linalloc_explicit((ap), sizeof(T), alignof(T)))
 
 typedef struct arena arena;
 
 arena *arena_create(ssize len);
 int arena_destroy(arena **arena);
-void *linalloc(arena *arena, ssize itemsz, int32_t align);
+void *linalloc_explicit(arena *arena, ssize itemsz, int32_t align);
 void arena_reset(arena *arena);
 
 #endif
