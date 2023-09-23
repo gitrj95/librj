@@ -1,0 +1,17 @@
+name: Release candidate
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Unit tests
+        run: |
+          cc --version
+          clang --version
+          make check

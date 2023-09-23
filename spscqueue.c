@@ -37,9 +37,8 @@ bool spscqueue_trypush(spscqueue *restrict q, void const *restrict p) {
   char *next_wp = wp + q->itemsz;
   if (next_wp == q->tl) next_wp = q->hd;
   if (next_wp == C(q->writerr)) {
-    q->writerr = atomic_load_explicit(&q->r, memory_order_relaxed);
+    q->writerr = atomic_load_explicit(&q->r, memory_order_consume);
     if (next_wp == C(q->writerr)) return 0;
-#undef C
   }
   memcpy(wp, p, q->itemsz);
   atomic_store_explicit(&q->w, (intptr_t)next_wp, memory_order_release);
@@ -57,6 +56,6 @@ void const *spscqueue_trypop(spscqueue *q) {
   }
   char *next_rp = rp + q->itemsz;
   if (next_rp == q->tl) next_rp = q->hd;
-  atomic_store_explicit(&q->r, (intptr_t)next_rp, memory_order_relaxed);
+  atomic_store_explicit(&q->r, (intptr_t)next_rp, memory_order_release);
   return rp;
 }

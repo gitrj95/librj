@@ -30,7 +30,10 @@
 static inline int32_t msi_next(int exp, uint64_t hash, int32_t i);
 
 static inline int32_t msi_init(int exp, uint64_t hash) {
-  return msi_next(exp, hash, hash & 0x3fffffff);
+  return msi_next(
+      exp, hash,
+      (int32_t)(hash & 0x3fffffff)); /* some implementations can't figure out
+                                        that it's guaranteed to fit... */
 }
 
 static inline int32_t msi_next(int exp, uint64_t hash, int32_t i) {
@@ -38,7 +41,7 @@ static inline int32_t msi_next(int exp, uint64_t hash, int32_t i) {
   assert(exp < 31);
   assert(i > -1);
   uint32_t m = (1 << exp) - 1;
-  uint32_t s = ((hash >> 34) >> (30 - exp)) | 1;
+  uint32_t s = (uint32_t)((hash >> 34) >> (30 - exp)) | 1; /* same... */
   return (i + s) & m;
 }
 

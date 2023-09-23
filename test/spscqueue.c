@@ -2,24 +2,22 @@
 #include <assert.h>
 #include <pthread.h>
 #include <stdio.h>
-#include <time.h>
 #include "../test.h"
 
-#define BERTHA 1'000'000
+#define BERTHA 10000
 
-static int big_bertha[BERTHA];
+static int big_bertha[100];
 
 struct opt {
   spscqueue *q;
   int n;
-  int sleep;
+  int spin;
 };
 
 void produce(void *ctx) {
   struct opt *opt = ctx;
   for (int i = 1; i < opt->n; ++i) {
-    struct timespec ts = {.tv_sec = 0, .tv_nsec = opt->sleep};
-    nanosleep(&ts, 0);
+    for (int j = 0; j < opt->spin; ++j) {}
     spscqueue_push(opt->q, &i);
   }
 }
@@ -27,10 +25,9 @@ void produce(void *ctx) {
 void *consume(void *ctx) {
   struct opt *opt = ctx;
   for (int i = 1; i < opt->n; ++i) {
-    struct timespec ts = {.tv_sec = 0, .tv_nsec = opt->sleep};
     void const *p = spscqueue_pop(opt->q);
     assert(i == *(int const *)p);
-    nanosleep(&ts, 0);
+    for (int j = 0; j < opt->spin; ++j) {}
   }
   return 0;
 }
@@ -82,14 +79,16 @@ void trypop(void) {
 void pushnpop(void) {
   test();
   spscqueue q;
-  spscqueue_init(&q, big_bertha, big_bertha + BERTHA, sizeof(big_bertha[0]));
-  struct opt ctx = {.n = BERTHA, .q = &q, .sleep = 0};
+  spscqueue_init(&q, big_bertha,
+                 big_bertha + sizeof(big_bertha) / sizeof(big_bertha[0]),
+                 sizeof(big_bertha[0]));
+  struct opt ctx = {.n = BERTHA, .q = &q, .spin = 0};
   pthread_t consumer;
   pthread_create(&consumer, 0, consume, &ctx);
   produce(&ctx);
   pthread_join(consumer, 0);
   expect_true(1 && "Zero-latency SPSC");
-  struct opt slow_ctx = (struct opt){.n = BERTHA, .q = &q, .sleep = 1};
+  struct opt slow_ctx = (struct opt){.n = BERTHA, .q = &q, .spin = 10000};
   pthread_create(&consumer, 0, consume, &slow_ctx);
   produce(&ctx);
   pthread_join(consumer, 0);
@@ -102,8 +101,8 @@ void pushnpop(void) {
   pthread_join(consumer, 0);
   expect_true(1 && "Slow-producer SPSC");
   int primes[] = {19, 37};
-  ctx.sleep = primes[0];
-  slow_ctx.sleep = primes[1];
+  ctx.spin = primes[0];
+  slow_ctx.spin = primes[1];
   pthread_create(&consumer, 0, consume, &slow_ctx);
   produce(&ctx);
   pthread_join(consumer, 0);

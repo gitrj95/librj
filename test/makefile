@@ -3,7 +3,7 @@
 .FORCE:
 
 CC = cc
-STD = gnu2x # typeof operators not in gcc/clang yet for C23
+STD = gnu2x # typeof operators not in gcc/clang yet for c23
 NCOLOR = 0
 DELIM = echo "~~"
 ASAN = -fsanitize=address
@@ -24,9 +24,9 @@ arena: arena.c .FORCE
 
 test_spscqueue: spscqueue_tsan spscqueue_asan
 	@$(DELIM)
-	@echo "[Under TSAN]"
+	@echo "[Under TSan]"
 	@./spscqueue_tsan
-	@echo "[Under ASAN/UBSAN]"
+	@echo "[Under ASan/UBSan]"
 	@./spscqueue_asan
 	@$(DELIM)
 
@@ -38,9 +38,9 @@ spscqueue_asan: spscqueue.c .FORCE
 
 test_spinlock: spinlock_tsan spinlock_asan
 	@$(DELIM)
-	@echo "[Under TSAN]"
+	@echo "[Under TSan]"
 	@./spinlock_tsan
-	@echo "[Under ASAN/UBSAN]"
+	@echo "[Under ASan/UBSan]"
 	@./spinlock_asan
 	@$(DELIM)
 
