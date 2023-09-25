@@ -1,12 +1,13 @@
 #include "../spscqueue.c"
 #include <assert.h>
 #include <pthread.h>
-#include <stdio.h>
+#include <stdatomic.h>
 #include "../test.h"
 
 #define BERTHA 10000
 
 static int big_bertha[100];
+atomic_uint nops;
 
 struct opt {
   spscqueue *q;
@@ -14,18 +15,21 @@ struct opt {
   int spin;
 };
 
-void produce(void *ctx) {
+void *produce(void *ctx) {
   struct opt *opt = ctx;
-  for (int i = 1; i < opt->n; ++i) {
+  for (int i = 1; i < 1 + opt->n; ++i) {
     for (int j = 0; j < opt->spin; ++j) {}
     spscqueue_push(opt->q, &i);
+    atomic_fetch_add_explicit(&nops, 1, memory_order_relaxed);
   }
+  return 0;
 }
 
 void *consume(void *ctx) {
   struct opt *opt = ctx;
-  for (int i = 1; i < opt->n; ++i) {
+  for (int i = 1; i < 1 + opt->n; ++i) {
     void const *p = spscqueue_pop(opt->q);
+    atomic_fetch_add_explicit(&nops, 1, memory_order_relaxed);
     assert(i == *(int const *)p);
     for (int j = 0; j < opt->spin; ++j) {}
   }
@@ -76,36 +80,34 @@ void trypop(void) {
   expect_abort(spscqueue_trypop(0));
 }
 
-void pushnpop(void) {
-  test();
+void mintnrun_thrds(int pspin, int cspin) {
   spscqueue q;
   spscqueue_init(&q, big_bertha,
                  big_bertha + sizeof(big_bertha) / sizeof(big_bertha[0]),
                  sizeof(big_bertha[0]));
-  struct opt ctx = {.n = BERTHA, .q = &q, .spin = 0};
-  pthread_t consumer;
-  pthread_create(&consumer, 0, consume, &ctx);
-  produce(&ctx);
+  struct opt pctx = {.n = BERTHA, .q = &q, .spin = pspin};
+  struct opt cctx = {.n = BERTHA, .q = &q, .spin = cspin};
+  pthread_t producer, consumer;
+  pthread_create(&producer, 0, produce, &pctx);
+  pthread_create(&consumer, 0, consume, &cctx);
+  while (atomic_load_explicit(&q.r, memory_order_consume) !=
+         atomic_load_explicit(&q.w, memory_order_consume)) {}
+  pthread_join(producer, 0);
   pthread_join(consumer, 0);
+  assert(2 * BERTHA == nops);
+  nops = 0;
+}
+
+void pushnpop(void) {
+  test();
+  mintnrun_thrds(0, 0);
   expect_true(1 && "Zero-latency SPSC");
-  struct opt slow_ctx = (struct opt){.n = BERTHA, .q = &q, .spin = 10000};
-  pthread_create(&consumer, 0, consume, &slow_ctx);
-  produce(&ctx);
-  pthread_join(consumer, 0);
+  mintnrun_thrds(0, 10000);
   expect_true(1 && "Slow-consumer SPSC");
-  pthread_create(&consumer, 0, consume, &slow_ctx);
-  produce(&ctx);
-  pthread_join(consumer, 0);
-  pthread_create(&consumer, 0, consume, &ctx);
-  produce(&slow_ctx);
-  pthread_join(consumer, 0);
+  mintnrun_thrds(10000, 0);
   expect_true(1 && "Slow-producer SPSC");
   int primes[] = {19, 37};
-  ctx.spin = primes[0];
-  slow_ctx.spin = primes[1];
-  pthread_create(&consumer, 0, consume, &slow_ctx);
-  produce(&ctx);
-  pthread_join(consumer, 0);
+  mintnrun_thrds(primes[0], primes[1]);
   expect_true(1 && "Dual-latency SPSC");
 }
 

@@ -13,7 +13,7 @@ void spscqueue_init(spscqueue *restrict q, void *hd, void *tl, ssize itemsz) {
 #define HD ((char *)hd)
 #define TL ((char *)tl)
   assert(HD < TL);
-  assert(itemsz > 0);
+  assert(0 < itemsz);
   assert(!((TL - HD) % itemsz));
   assert(1 < (TL - HD) / itemsz);
 #undef TL
