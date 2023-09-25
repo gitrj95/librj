@@ -27,6 +27,10 @@
 #include <assert.h>
 #include <stdint.h>
 
+#define msi_loop(iname, exp, hash)                                           \
+  for (int32_t iname = msi_init((exp), (hash)), i__ = 0; i__ < (1 << (exp)); \
+       ++i__, iname = msi_next((exp), (hash), iname))
+
 static inline int32_t msi_next(int exp, uint64_t hash, int32_t i);
 
 static inline int32_t msi_init(int exp, uint64_t hash) {
@@ -37,7 +41,7 @@ static inline int32_t msi_init(int exp, uint64_t hash) {
 }
 
 static inline int32_t msi_next(int exp, uint64_t hash, int32_t i) {
-  assert(exp > 0);
+  assert(exp > -1);
   assert(exp < 31);
   assert(i > -1);
   uint32_t m = (1 << exp) - 1;
