@@ -44,9 +44,9 @@ static inline int32_t msi_next(int exp, uint64_t hash, int32_t i) {
   assert(-1 < exp);
   assert(31 > exp);
   assert(-1 < i);
-  uint32_t m = (1 << exp) - 1;
-  uint32_t s = (uint32_t)((hash >> 34) >> (30 - exp)) | 1; /* same... */
-  return (i + s) & m;
+  uint32_t w = (1 << exp) - 1;
+  uint32_t step = (uint32_t)((hash >> 34) >> (30 - exp)) | 1; /* same... */
+  return (i + step) & w;
 }
 
 #endif

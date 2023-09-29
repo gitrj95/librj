@@ -39,6 +39,7 @@ bool spscqueue_trypush(spscqueue *restrict q, void const *restrict p) {
   if (next_wp == C(q->writerr)) {
     q->writerr = atomic_load_explicit(&q->r, memory_order_consume);
     if (next_wp == C(q->writerr)) return 0;
+#undef C
   }
   memcpy(wp, p, q->itemsz);
   atomic_store_explicit(&q->w, (intptr_t)next_wp, memory_order_release);
