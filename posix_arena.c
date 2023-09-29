@@ -12,6 +12,8 @@
 #include "arena.h"
 #include "ssize.h"
 
+#define unlikely(expr) __builtin_expect(!!(expr), 0)
+
 struct arena {
   char *hd, *tl, *p;
 };
@@ -50,9 +52,9 @@ void *linalloc_explicit(struct arena *a, ssize itemsz, int32_t align) {
   uintptr_t addr = (uintptr_t)a->p;
   addr -= itemsz;
   addr = addr & ~(align - 1); /* need sign extension */
-  a->p = addr < (uintptr_t)a->hd
-             ? 0
-             : (char *)addr; /* trade backtracking capability for cmov */
+  if (unlikely(addr < (uintptr_t)a->hd))
+    return 0; /* prefer speculative execution to cmov */
+  a->p = (char *)addr;
   return a->p;
 }
 
