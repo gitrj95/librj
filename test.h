@@ -69,7 +69,7 @@
     signal(SIGABRT, old__);                        \
   } while (0)
 
-volatile sig_atomic_t fail_;
+sig_atomic_t volatile fail_;
 jmp_buf frame_;
 
 void unwind_(int sig) {

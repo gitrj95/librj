@@ -101,14 +101,14 @@ void mintnrun_thrds(int pspin, int cspin) {
 void pushnpop(void) {
   test();
   mintnrun_thrds(0, 0);
-  expect_true(1 && "Zero-latency SPSC");
+  pass("Zero-latency SPSC");
   mintnrun_thrds(0, 10000);
-  expect_true(1 && "Slow-consumer SPSC");
+  pass("Slow-consumer SPSC");
   mintnrun_thrds(10000, 0);
-  expect_true(1 && "Slow-producer SPSC");
+  pass("Slow-producer SPSC");
   int primes[] = {19, 37};
   mintnrun_thrds(primes[0], primes[1]);
-  expect_true(1 && "Dual-latency SPSC");
+  pass("Dual-latency SPSC");
 }
 
 int main(void) {
