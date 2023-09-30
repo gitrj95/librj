@@ -3,7 +3,7 @@
 .FORCE:
 
 CC = cc
-STD = gnu2x # typeof operators not in gcc/clang yet for C23
+STD = gnu2x # typeof operators not in gcc/clang yet for c23
 NCOLOR = 0 # pass through
 CFLAGS = -std=$(STD) -Wall -Wextra -Wconversion -Wno-sign-conversion -Wdouble-promotion -Wcast-qual -Wvla -Werror -O3 -DNDEBUG -flto -march=native
 ARFLAGS = -rcs

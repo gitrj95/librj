@@ -1,11 +1,13 @@
 *~
 *#
 
+*.org
+
 bin/*
 !bin/.gitkeep
 
 test/*
-!test/makefile
+!test/Makefile
 !test/*.c
 !test/*.h
 
