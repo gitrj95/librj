@@ -37,9 +37,9 @@ void next(void) {
     assert(!seen[i]);
     seen[i] += 1;
   }
-  expect_true(1 && "No cycles");
+  pass("No cycles");
   for (int k = 0; k < (1 << EXP); ++k) assert(1 == seen[k]);
-  expect_true(1 && "Domain exhausted");
+  pass("Domain exhausted");
   i = msi_init(0, h);
   expect_true(!msi_next(0, h, i));
   expect_abort(msi_next(-1, 0, 0));
@@ -55,9 +55,9 @@ void loop(void) {
     assert(!seen[i]);
     seen[i] += 1;
   }
-  expect_true(1 && "No cycles");
+  pass("No cycles");
   for (int k = 0; k < (1 << EXP); ++k) assert(1 == seen[k]);
-  expect_true(1 && "Domain exhausted");
+  pass("Domain exhausted");
 }
 
 int main(void) {
