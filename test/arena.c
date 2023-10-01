@@ -12,11 +12,11 @@ void createndestroy(void) {
   expect_true(ap->hd < ap->tl);
   expect_true(ap->p == ap->tl);
   expect_true(!((uintptr_t)ap->hd % sysconf(_SC_PAGESIZE)));
-  arena_destroy(&ap);
+  arena_delete(&ap);
   expect_true(!ap);
   expect_abort(arena_create(-1));
-  expect_abort(arena_destroy(0));
-  expect_abort(arena_destroy(&ap));
+  expect_abort(arena_delete(0));
+  expect_abort(arena_delete(&ap));
 }
 
 void alloc(void) {
@@ -35,7 +35,7 @@ void alloc(void) {
   expect_true(!((uintptr_t)ap->p % (1 << 10)));
   k = linalloc(ap, int);
   expect_true(!k);
-  arena_destroy(&ap);
+  arena_delete(&ap);
   int64_t pagesz = sysconf(_SC_PAGESIZE);
   ap = arena_create(pagesz + 123);
   expect_true(ap);
@@ -53,7 +53,7 @@ void alloc(void) {
   expect_abort(linalloc_explicit(ap, 0, 0));
   expect_abort(linalloc_explicit(ap, 10, -1));
   expect_abort(linalloc_explicit(ap, 10, 123));
-  arena_destroy(&ap);
+  arena_delete(&ap);
 }
 
 void reset(void) {
@@ -75,7 +75,7 @@ void reset(void) {
   expect_true(t->a[0] == 3);
   expect_true(t->a[1] == 4);
   expect_abort(arena_reset(0));
-  arena_destroy(&ap);
+  arena_delete(&ap);
 }
 
 int main(void) {

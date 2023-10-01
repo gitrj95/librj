@@ -32,7 +32,7 @@ struct arena *arena_create(ssize len) {
   return a;
 }
 
-int arena_destroy(struct arena **a) {
+int arena_delete(struct arena **a) {
   assert(a);
   assert(*a);
   ptrdiff_t len = a[0]->tl - a[0]->hd;
