@@ -3,7 +3,7 @@
 .FORCE:
 
 CC = cc
-STD = gnu2x # typeof operators not in gcc/clang yet for c23
+STD = gnu2x
 NCOLOR = 0
 DELIM = echo "~~"
 ASAN = -fsanitize=address
