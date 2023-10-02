@@ -6,8 +6,8 @@
 
 #define BERTHA 10000
 
-static int big_bertha[100];
-atomic_uint nops;
+int big_bertha[100];
+atomic_int nops;
 
 struct opt {
   spscqueue *q;
@@ -43,15 +43,16 @@ void init(void) {
   spscqueue_init_from_static(&q0, a);
   expect_true(sizeof(a) == (char *)q0.tl - (char *)q0.hd);
   float *f = malloc(1000 * sizeof(*f));
-  spscqueue_init(&q1, f, f + 1000, sizeof(*f));
+  spscqueue_init(&q1, f, 1000, sizeof(*f));
   expect_true(sizeof(a) == (char *)q0.tl - (char *)q0.hd);
   free(f);
-  expect_abort(spscqueue_init(0, a, a + 20, 10));
-  expect_abort(spscqueue_init(&q0, 0, a + 20, 10));
+  expect_abort(spscqueue_init(0, a, 20, 10));
+  expect_abort(spscqueue_init(&q0, 0, 20, 10));
   expect_abort(spscqueue_init(&q0, a, 0, 10));
-  expect_abort(spscqueue_init(&q0, a, a + 20, 0));
-  expect_abort(spscqueue_init(&q0, a + 19, a + 3, 0));
-  expect_abort(spscqueue_init(&q0, a, a + 1000, 99));
+  expect_abort(spscqueue_init(&q0, a, 20, 0));
+  expect_abort(spscqueue_init(&q0, a + 19, 3, 0));
+  expect_abort(spscqueue_init(&q0, a, 1000, 99));
+  expect_abort(spscqueue_init(&q0, a, 1, sizeof(*f)));
 }
 
 void trypush(void) {
@@ -82,9 +83,7 @@ void trypop(void) {
 
 void mintnrun_thrds(int pspin, int cspin) {
   spscqueue q;
-  spscqueue_init(&q, big_bertha,
-                 big_bertha + sizeof(big_bertha) / sizeof(big_bertha[0]),
-                 sizeof(big_bertha[0]));
+  spscqueue_init_from_static(&q, big_bertha);
   struct opt pctx = {.n = BERTHA, .q = &q, .spin = pspin};
   struct opt cctx = {.n = BERTHA, .q = &q, .spin = cspin};
   pthread_t producer, consumer;

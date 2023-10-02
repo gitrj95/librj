@@ -68,12 +68,8 @@
 #define CACHE_BLOCK_BYTES 64
 #endif
 
-#define spscqueue_init_from_static(qp, a)                          \
-  do {                                                             \
-    ssize sz__ = sizeof(a) / sizeof((a)[0]);                       \
-    typeof(&a[0]) a_dcy__ = (a);                                   \
-    spscqueue_init((qp), a_dcy__, a_dcy__ + sz__, sizeof((a)[0])); \
-  } while (0)
+#define spscqueue_init_from_static(qp, a) \
+  spscqueue_init((qp), (a), sizeof(a), sizeof((a)[0]))
 
 typedef struct {
   ssize itemsz;
@@ -82,7 +78,8 @@ typedef struct {
   alignas(CACHE_BLOCK_BYTES) intptr_t readerw, writerr;
 } spscqueue;
 
-void spscqueue_init(spscqueue *restrict q, void *hd, void *tl, ssize itemsz);
+void spscqueue_init(spscqueue *restrict q, void *buf, ssize buflen,
+                    ssize itemsz);
 bool spscqueue_trypush(spscqueue *restrict q, void const *restrict p);
 void const *spscqueue_trypop(spscqueue *q);
 

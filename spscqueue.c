@@ -6,26 +6,22 @@
 #include <string.h>
 #include "ssize.h"
 
-void spscqueue_init(spscqueue *restrict q, void *hd, void *tl, ssize itemsz) {
+void spscqueue_init(spscqueue *restrict q, void *buf, ssize buflen,
+                    ssize itemsz) {
   assert(q);
-  assert(hd);
-  assert(tl);
-#define HD ((char *)hd)
-#define TL ((char *)tl)
-  assert(HD < TL);
+  assert(buf);
+  assert(1 < buflen);
   assert(0 < itemsz);
-  assert(!((TL - HD) % itemsz));
-  assert(1 < (TL - HD) / itemsz);
-#undef TL
-#undef HD
-#define I(x) ((intptr_t)(x))
+  assert(!(buflen % itemsz));
+  char *tl = (char *)buf + buflen;
   *q = (spscqueue){.itemsz = itemsz,
-                   .hd = hd,
+                   .hd = buf,
                    .tl = tl,
-                   .w = I(hd),
-                   .r = I(hd),
-                   .readerw = I(hd),
-                   .writerr = I(hd)};
+#define I(x) ((intptr_t)(x))
+                   .w = I(buf),
+                   .r = I(buf),
+                   .readerw = I(buf),
+                   .writerr = I(buf)};
 #undef I
 }
 
