@@ -6,5 +6,5 @@
 -Wdouble-promotion
 -Wcast-qual
 -Wvla
--Wpedantic
 -Werror
+-pedantic

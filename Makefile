@@ -5,7 +5,7 @@
 CC = cc
 STD = gnu2x
 NCOLOR = 0
-CFLAGS = -std=$(STD) -Wall -Wextra -Wconversion -Wno-sign-conversion -Wdouble-promotion -Wcast-qual -Wvla -Werror -O3 -DNDEBUG -flto -march=native
+CFLAGS = -std=$(STD) -Wall -Wextra -Wconversion -Wno-sign-conversion -Wdouble-promotion -Wcast-qual -Wvla -Werror -pedantic -O3 -DNDEBUG -flto -march=native
 ARFLAGS = -rcs
 
 all: bin/librj.a

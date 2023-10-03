@@ -40,7 +40,7 @@ void init(void) {
   test();
   spscqueue q0, q1;
   int a[1000] = {0};
-  spscqueue_init_from_static(&q0, a);
+  spscqueue_init2(&q0, a);
   expect_true(sizeof(a) == (char *)q0.tl - (char *)q0.hd);
   float *f = malloc(1000 * sizeof(*f));
   spscqueue_init(&q1, f, 1000, sizeof(*f));
@@ -59,7 +59,7 @@ void trypush(void) {
   test();
   spscqueue q;
   int a[2] = {0};
-  spscqueue_init_from_static(&q, a);
+  spscqueue_init2(&q, a);
   int ins = 11;
   expect_true(spscqueue_trypush(&q, &ins));
   expect_true(!spscqueue_trypush(&q, &ins));
@@ -71,7 +71,7 @@ void trypop(void) {
   test();
   spscqueue q;
   int a[10000] = {0};
-  spscqueue_init_from_static(&q, a);
+  spscqueue_init2(&q, a);
   int ins = 11;
   spscqueue_trypush(&q, &ins);
   void const *top;
@@ -83,7 +83,7 @@ void trypop(void) {
 
 void mintnrun_thrds(int pspin, int cspin) {
   spscqueue q;
-  spscqueue_init_from_static(&q, big_bertha);
+  spscqueue_init2(&q, big_bertha);
   struct opt pctx = {.n = BERTHA, .q = &q, .spin = pspin};
   struct opt cctx = {.n = BERTHA, .q = &q, .spin = cspin};
   pthread_t producer, consumer;

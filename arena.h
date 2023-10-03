@@ -19,6 +19,7 @@
 typedef struct arena arena;
 
 arena *arena_create(ssize len);
+arena *arena_create3(void *buf, ssize buflen, void (*deleter)(void *));
 int arena_delete(arena **a);
 void *linalloc_explicit(arena *a, ssize itemsz, int32_t align);
 void arena_reset(arena *a);
