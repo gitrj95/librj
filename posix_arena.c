@@ -19,17 +19,13 @@ struct arena {
   void (*deleter)(void *);
 };
 
-static void dummy_deleter(void *);
-
 struct arena *arena_create(ssize len) {
   assert(0 < len);
   void *buf =
       mmap(0, len, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
   if (MAP_FAILED == buf) return 0;
-  return arena_create3(buf, len, dummy_deleter);
+  return arena_create3(buf, len, 0);
 }
-
-static void dummy_deleter(void *) {}
 
 struct arena *arena_create3(void *buf, ssize buflen, void (*deleter)(void *)) {
   static_assert(sizeof(ptrdiff_t) <= sizeof(ssize));
@@ -48,7 +44,7 @@ int arena_delete(struct arena **a) {
   assert(a);
   assert(*a);
   ptrdiff_t len = a[0]->tl - a[0]->hd;
-  if (dummy_deleter != a[0]->deleter)
+  if (a[0]->deleter)
     a[0]->deleter(a[0]->hd);
   else if (munmap(a[0]->hd, len))
     return -1;
