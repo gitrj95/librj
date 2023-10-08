@@ -31,6 +31,8 @@ void create3ndelete(void) {
   expect_true(a->tl > (char *)n);
   *n = 123;
   arena_delete(&a);
+  a = arena_create(PTRDIFF_MAX);
+  expect_true(!a);
   expect_abort(arena_create3(0, 1, free));
   expect_abort(arena_create3(buf, 0, free));
 }

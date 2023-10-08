@@ -28,10 +28,9 @@ struct arena *arena_create(ssize len) {
 }
 
 struct arena *arena_create3(void *buf, ssize buflen, void (*deleter)(void *)) {
-  static_assert(sizeof(ptrdiff_t) <= sizeof(ssize));
   assert(buf);
   assert(0 < buflen);
-  assert(PTRDIFF_MAX >= buflen);
+  if (buflen >= PTRDIFF_MAX) return 0;
   struct arena *a = malloc(sizeof(*a));
   if (!a) return 0;
   *a =
@@ -54,11 +53,11 @@ int arena_delete(struct arena **a) {
 }
 
 void *linalloc_explicit(struct arena *a, ssize itemsz, int32_t align) {
-  static_assert(sizeof(uintptr_t) >= sizeof(uint32_t));
   assert(a);
   assert(0 < itemsz);
   assert(-1 < align);
   assert(!(align & (align - 1)));
+  static_assert(sizeof(uintptr_t) >= sizeof(uint32_t));
   uintptr_t addr = (uintptr_t)a->p;
   addr -= itemsz;
   addr = addr & ~(align - 1); /* need sign extension */
