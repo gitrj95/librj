@@ -24,8 +24,8 @@ clean: .FORCE
 bin/librj.a: bin/posix_arena.o bin/spscqueue.o
 	ar $(ARFLAGS) $@ bin/posix_arena.o bin/spscqueue.o
 
-bin/posix_arena.o: posix_arena.c arena.h ssize.h
+bin/posix_arena.o: posix_arena.c arena.h
 	$(CC) -o $@ $(CFLAGS) -c $<
 
-bin/spscqueue.o: spscqueue.c spscqueue.h ssize.h
+bin/spscqueue.o: spscqueue.c spscqueue.h
 	$(CC) -o $@ $(CFLAGS) -c $<

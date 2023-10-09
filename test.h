@@ -48,7 +48,7 @@
 #define test() fprintf(stderr, "%sTest: %s%s\n", KYEL, __func__, KNRM)
 #define pass(str) fprintf(stderr, "  %sPass: %s%s\n", KGRN, (str), KNRM)
 #define fail(str) \
-  (fprintf(stderr, "  %sFail: %s\n%s", KRED, (str), KNRM), exit(EXIT_FAILURE))
+  (fprintf(stderr, "  %sFail: %s\n%s", KRED, (str), KNRM), __builtin_trap())
 
 #define expect_true(expr) \
   do {                    \

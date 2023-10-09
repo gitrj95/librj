@@ -6,11 +6,11 @@
 */
 
 #include <assert.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/mman.h>
 #include "arena.h"
-#include "ssize.h"
 
 #define unlikely(expr) __builtin_expect(!!(expr), 0)
 
@@ -19,7 +19,7 @@ struct arena {
   void (*deleter)(void *);
 };
 
-struct arena *arena_create(ssize len) {
+struct arena *arena_create(ptrdiff_t len) {
   assert(0 < len);
   void *buf =
       mmap(0, len, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -27,10 +27,10 @@ struct arena *arena_create(ssize len) {
   return arena_create3(buf, len, 0);
 }
 
-struct arena *arena_create3(void *buf, ssize buflen, void (*deleter)(void *)) {
+struct arena *arena_create3(void *buf, ptrdiff_t buflen,
+                            void (*deleter)(void *)) {
   assert(buf);
   assert(0 < buflen);
-  if (buflen >= PTRDIFF_MAX) return 0;
   struct arena *a = malloc(sizeof(*a));
   if (!a) return 0;
   *a =
@@ -52,7 +52,7 @@ int arena_delete(struct arena **a) {
   return 0;
 }
 
-void *linalloc_explicit(struct arena *a, ssize itemsz, int32_t align) {
+void *linalloc_explicit(struct arena *a, ptrdiff_t itemsz, int32_t align) {
   assert(a);
   assert(0 < itemsz);
   assert(-1 < align);

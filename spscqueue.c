@@ -2,12 +2,12 @@
 #include <assert.h>
 #include <stdatomic.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-#include "ssize.h"
 
-void spscqueue_init(spscqueue *restrict q, void *buf, ssize buflen,
-                    ssize itemsz) {
+void spscqueue_init(spscqueue *restrict q, void *buf, ptrdiff_t buflen,
+                    ptrdiff_t itemsz) {
   assert(q);
   assert(buf);
   assert(1 < buflen);

@@ -61,8 +61,8 @@
 #include <stdalign.h>
 #include <stdatomic.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
-#include "ssize.h"
 
 #ifndef CACHE_BLOCK_BYTES
 #define CACHE_BLOCK_BYTES 64
@@ -72,14 +72,14 @@
   spscqueue_init((qp), (a), sizeof(a), sizeof((a)[0]))
 
 typedef struct {
-  ssize itemsz;
+  ptrdiff_t itemsz;
   void *hd, *tl;
   alignas(CACHE_BLOCK_BYTES) atomic_intptr_t w, r;
   alignas(CACHE_BLOCK_BYTES) intptr_t readerw, writerr;
 } spscqueue;
 
-void spscqueue_init(spscqueue *restrict q, void *buf, ssize buflen,
-                    ssize itemsz);
+void spscqueue_init(spscqueue *restrict q, void *buf, ptrdiff_t buflen,
+                    ptrdiff_t itemsz);
 bool spscqueue_trypush(spscqueue *restrict q, void const *restrict p);
 void const *spscqueue_trypop(spscqueue *q);
 
