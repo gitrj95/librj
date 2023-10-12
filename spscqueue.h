@@ -58,11 +58,11 @@
 #ifndef SPSCQUEUE_H
 #define SPSCQUEUE_H
 
+#include <assert.h>
 #include <stdalign.h>
 #include <stdatomic.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 
 #ifndef CACHE_BLOCK_BYTES
 #define CACHE_BLOCK_BYTES 64
@@ -74,9 +74,10 @@
 typedef struct {
   ptrdiff_t itemsz;
   void *hd, *tl;
-  alignas(CACHE_BLOCK_BYTES) atomic_intptr_t w, r;
-  alignas(CACHE_BLOCK_BYTES) intptr_t readerw, writerr;
+  alignas(CACHE_BLOCK_BYTES) _Atomic(char *) w, r;
+  alignas(CACHE_BLOCK_BYTES) _Atomic(char *) readerw, writerr;
 } spscqueue;
+static_assert(atomic_is_lock_free(&(spscqueue){0}.w));
 
 void spscqueue_init(spscqueue *restrict q, void *buf, ptrdiff_t buflen,
                     ptrdiff_t itemsz);
