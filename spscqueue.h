@@ -58,7 +58,6 @@
 #ifndef SPSCQUEUE_H
 #define SPSCQUEUE_H
 
-#include <assert.h>
 #include <stdalign.h>
 #include <stdatomic.h>
 #include <stdbool.h>

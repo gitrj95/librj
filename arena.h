@@ -14,7 +14,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define linalloc(ap, T) (T *)(linalloc_explicit((ap), sizeof(T), alignof(T)))
+#define linalloc(ap, T) linalloc_explicit((ap), sizeof(T), alignof(T))
 
 typedef struct arena arena;
 

@@ -28,9 +28,9 @@ void *produce(void *ctx) {
 void *consume(void *ctx) {
   struct opt *opt = ctx;
   for (int i = 1; i < 1 + opt->n; ++i) {
-    void const *p = spscqueue_pop(opt->q);
+    int const *p = spscqueue_pop(opt->q);
     atomic_fetch_add_explicit(&nops, 1, memory_order_relaxed);
-    assert(i == *(int const *)p);
+    assert(i == *p);
     for (int j = 0; j < opt->spin; ++j) {}
   }
   return 0;
