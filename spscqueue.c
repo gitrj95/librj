@@ -7,6 +7,7 @@
 
 void spscqueue_init(spscqueue *restrict q, void *buf, ptrdiff_t buflen,
                     ptrdiff_t itemsz) {
+  assert(atomic_is_lock_free(&(spscqueue){0}.w));
   assert(q);
   assert(buf);
   assert(1 < buflen);

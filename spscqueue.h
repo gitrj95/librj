@@ -76,7 +76,6 @@ typedef struct {
   alignas(CACHE_BLOCK_BYTES) _Atomic(char *) w, r;
   alignas(CACHE_BLOCK_BYTES) _Atomic(char *) readerw, writerr;
 } spscqueue;
-static_assert(atomic_is_lock_free(&(spscqueue){0}.w));
 
 void spscqueue_init(spscqueue *restrict q, void *buf, ptrdiff_t buflen,
                     ptrdiff_t itemsz);
