@@ -3,6 +3,7 @@
 #include <stdatomic.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 
 void spscqueue_init(spscqueue *restrict q, void *buf, ptrdiff_t buflen,

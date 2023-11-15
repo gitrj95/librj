@@ -28,7 +28,6 @@
 #include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #if NCOLOR
 #define KNRM ""

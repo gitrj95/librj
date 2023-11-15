@@ -1,5 +1,4 @@
 #include "../arraysize.h"
-#include <assert.h>
 #include "../test.h"
 
 struct a {

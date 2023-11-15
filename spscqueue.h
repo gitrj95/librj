@@ -59,7 +59,6 @@
 #define SPSCQUEUE_H
 
 #include <stdalign.h>
-#include <stdatomic.h>
 #include <stdbool.h>
 #include <stddef.h>
 
