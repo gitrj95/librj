@@ -12,7 +12,7 @@ TSAN = -fsanitize=thread
 CFLAGS = -std=$(STD) -Wall -Wextra -Wconversion -Wno-sign-conversion -Wdouble-promotion -Wcast-qual -Wvla -Werror -pedantic -O0 -fpie -g3 -DNCOLOR=$(NCOLOR)
 LDFLAGS = -Wl,-pie
 
-check: test_arena test_spscqueue test_spinlock test_msi test_arraycnt
+check: test_arena test_spscqueue test_spinlock test_msi test_arraysize
 
 test_arena: arena
 	@$(DELIM)
@@ -58,10 +58,10 @@ test_msi: msi
 msi: msi.c .FORCE
 	$(CC) -o $@ $(CFLAGS) $(ASAN) $(UBSAN) $< $(LDFLAGS)
 
-test_arraycnt: arraycnt
+test_arraysize: arraysize
 	@$(DELIM)
-	@./arraycnt
+	@./arraysize
 	@$(DELIM)
 
-arraycnt: arraycnt.c .FORCE
+arraysize: arraysize.c .FORCE
 	$(CC) -o $@ $(CFLAGS) $(ASAN) $(UBSAN) $< $(LDFLAGS)

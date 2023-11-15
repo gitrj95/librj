@@ -1,4 +1,4 @@
-#include "../arraycnt.h"
+#include "../arraysize.h"
 #include <assert.h>
 #include "../test.h"
 
@@ -13,14 +13,14 @@ struct a buf[11];
 
 void buffers(void) {
   test();
-  expect_true(11 == arraycnt(buf));
+  expect_true(11 == arraysize(buf));
   char buf1[991];
-  expect_true(991 == arraycnt(buf1));
+  expect_true(991 == arraysize(buf1));
 }
 
 void sliterals(void) {
   test();
-  expect_true(6 == arraycnt("apple"));
+  expect_true(6 == arraysize("apple"));
 }
 
 int main(void) {
