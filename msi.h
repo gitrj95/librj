@@ -27,19 +27,6 @@
 #include <assert.h>
 #include <stdint.h>
 
-#define msi_loop(iname, exp, hash)                                           \
-  for (int32_t iname = msi_init((exp), (hash)), i__ = 0; i__ < (1 << (exp)); \
-       ++i__, iname = msi_next((exp), (hash), iname))
-
-static inline int32_t msi_next(int exp, uint64_t hash, int32_t i);
-
-static inline int32_t msi_init(int exp, uint64_t hash) {
-  return msi_next(
-      exp, hash,
-      (int32_t)(hash & 0x3fffffff)); /* some implementations can't figure out
-                                        that it's guaranteed to fit... */
-}
-
 static inline int32_t msi_next(int exp, uint64_t hash, int32_t i) {
   assert(-1 < exp);
   assert(31 > exp);
@@ -47,6 +34,13 @@ static inline int32_t msi_next(int exp, uint64_t hash, int32_t i) {
   uint32_t w = (1 << exp) - 1;
   uint32_t step = (uint32_t)((hash >> 34) >> (30 - exp)) | 1; /* same... */
   return (i + step) & w;
+}
+
+static inline int32_t msi_init(int exp, uint64_t hash) {
+  return msi_next(
+      exp, hash,
+      (int32_t)(hash & 0x3fffffff)); /* some implementations can't figure out
+                                        that it's guaranteed to fit... */
 }
 
 #endif

@@ -46,22 +46,8 @@ void next(void) {
   expect_abort(msi_next(32, 0, -1));
 }
 
-void loop(void) {
-  test();
-  int seen[1 << EXP] = {0};
-  uint64_t h = hash(12);
-  msi_loop(i, EXP, h) {
-    assert(!seen[i]);
-    seen[i] += 1;
-  }
-  pass("No cycles");
-  for (int k = 0; k < (1 << EXP); ++k) assert(1 == seen[k]);
-  pass("Domain exhausted");
-}
-
 int main(void) {
   suite();
   init();
   next();
-  loop();
 }
