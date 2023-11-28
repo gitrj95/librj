@@ -52,12 +52,12 @@ int arena_delete(struct arena **a) {
   return 0;
 }
 
-void *linalloc_explicit(struct arena *a, ptrdiff_t itemsz, int32_t align) {
+void *linalloc_explicit(struct arena *a, ptrdiff_t itemsz, int align) {
   assert(a);
   assert(0 < itemsz);
   assert(-1 < align);
   assert(!(align & (align - 1)));
-  static_assert(sizeof(uintptr_t) >= sizeof(uint32_t));
+  static_assert(sizeof(uintptr_t) >= sizeof(int));
   uintptr_t addr = (uintptr_t)a->p;
   addr -= itemsz;
   addr = addr & ~(align - 1); /* need sign extension */

@@ -12,7 +12,6 @@
 
 #include <stdalign.h>
 #include <stddef.h>
-#include <stdint.h>
 
 #define linalloc(ap, T) linalloc_explicit((ap), sizeof(T), alignof(T))
 
@@ -21,7 +20,7 @@ typedef struct arena arena;
 arena *arena_create(ptrdiff_t len);
 arena *arena_create3(void *buf, ptrdiff_t buflen, void (*deleter)(void *));
 int arena_delete(arena **a);
-void *linalloc_explicit(arena *a, ptrdiff_t itemsz, int32_t align);
+void *linalloc_explicit(arena *a, ptrdiff_t itemsz, int align);
 void arena_reset(arena *a);
 
 #endif
