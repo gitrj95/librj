@@ -1,7 +1,6 @@
 .POSIX:
 .SUFFIXES:
-.FORCE:
-
+.force:
 CC = cc
 STD = gnu2x
 NCOLOR = 0
@@ -19,7 +18,7 @@ test_arena: arena
 	@./arena
 	@$(DELIM)
 
-arena: arena.c .FORCE
+arena: arena.c .force
 	$(CC) -o $@ $(CFLAGS) $(ASAN) $(UBSAN) $< $(LDFLAGS)
 
 test_spscqueue: spscqueue_tsan spscqueue_asan
@@ -30,10 +29,10 @@ test_spscqueue: spscqueue_tsan spscqueue_asan
 	@./spscqueue_asan
 	@$(DELIM)
 
-spscqueue_tsan: spscqueue.c .FORCE
+spscqueue_tsan: spscqueue.c .force
 	$(CC) -o $@ $(CFLAGS) $(TSAN) $< $(LDFLAGS) -lpthread
 
-spscqueue_asan: spscqueue.c .FORCE
+spscqueue_asan: spscqueue.c .force
 	$(CC) -o $@ $(CFLAGS) $(ASAN) $(UBSAN) $< $(LDFLAGS) -lpthread
 
 test_spinlock: spinlock_tsan spinlock_asan
@@ -44,10 +43,10 @@ test_spinlock: spinlock_tsan spinlock_asan
 	@./spinlock_asan
 	@$(DELIM)
 
-spinlock_tsan: spinlock.c .FORCE
+spinlock_tsan: spinlock.c .force
 	$(CC) -o $@ $(CFLAGS) $(TSAN) $< $(LDFLAGS) -lpthread
 
-spinlock_asan: spinlock.c .FORCE
+spinlock_asan: spinlock.c .force
 	$(CC) -o $@ $(CFLAGS) $(ASAN) $(UBSAN) $< $(LDFLAGS) -lpthread
 
 test_msi: msi
@@ -55,7 +54,7 @@ test_msi: msi
 	@./msi
 	@$(DELIM)
 
-msi: msi.c .FORCE
+msi: msi.c .force
 	$(CC) -o $@ $(CFLAGS) $(ASAN) $(UBSAN) $< $(LDFLAGS)
 
 test_arraysize: arraysize
@@ -63,5 +62,5 @@ test_arraysize: arraysize
 	@./arraysize
 	@$(DELIM)
 
-arraysize: arraysize.c .FORCE
+arraysize: arraysize.c .force
 	$(CC) -o $@ $(CFLAGS) $(ASAN) $(UBSAN) $< $(LDFLAGS)

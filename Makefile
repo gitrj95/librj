@@ -1,7 +1,6 @@
 .POSIX:
 .SUFFIXES:
-.FORCE:
-
+.force:
 CC = cc
 STD = gnu2x
 NCOLOR = 0
@@ -10,14 +9,14 @@ ARFLAGS = -rcs
 
 all: bin/librj.a
 
-tools: .FORCE
+tools: .force
 	ln -sf $(PWD)/compile_flags.txt $(HOME)/compile_flags.txt
 	ln -sf $(PWD)/.clang-format $(HOME)/.clang-format
 
-check: .FORCE
+check: .force
 	@cd test && $(MAKE) NCOLOR=$(NCOLOR)
 
-clean: .FORCE
+clean: .force
 	cd bin && rm -rf *
 	cd bin && touch .gitkeep
 
