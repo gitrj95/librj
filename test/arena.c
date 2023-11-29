@@ -19,10 +19,15 @@ void createndelete(void) {
   expect_abort(arena_delete(&a));
 }
 
+void myfree(void *p, ptrdiff_t len) {
+  (void)len;
+  free(p);
+}
+
 void create3ndelete(void) {
   test();
   void *buf = malloc(123123);
-  arena *a = arena_create3(buf, 123123, free);
+  arena *a = arena_create3(buf, 123123, myfree);
   expect_true(a->hd == buf);
   expect_true(a->hd + 123123 == a->tl);
   int *n = linalloc(a, int);
@@ -33,8 +38,8 @@ void create3ndelete(void) {
   arena_delete(&a);
   a = arena_create(PTRDIFF_MAX);
   expect_true(!a);
-  expect_abort(arena_create3(0, 1, free));
-  expect_abort(arena_create3(buf, 0, free));
+  expect_abort(arena_create3(0, 1, myfree));
+  expect_abort(arena_create3(buf, 0, myfree));
 }
 
 void alloc(void) {

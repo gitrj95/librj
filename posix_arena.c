@@ -16,7 +16,7 @@
 
 struct arena {
   char *hd, *tl, *p;
-  void (*deleter)(void *);
+  void (*deleter)(void *, ptrdiff_t);
 };
 
 struct arena *arena_create(ptrdiff_t len) {
@@ -28,7 +28,7 @@ struct arena *arena_create(ptrdiff_t len) {
 }
 
 struct arena *arena_create3(void *buf, ptrdiff_t buflen,
-                            void (*deleter)(void *)) {
+                            void (*deleter)(void *, ptrdiff_t)) {
   assert(buf);
   assert(0 < buflen);
   struct arena *a = malloc(sizeof(*a));
@@ -44,7 +44,7 @@ int arena_delete(struct arena **a) {
   assert(*a);
   ptrdiff_t len = a[0]->tl - a[0]->hd;
   if (a[0]->deleter)
-    a[0]->deleter(a[0]->hd);
+    a[0]->deleter(a[0]->hd, len);
   else if (munmap(a[0]->hd, len))
     return -1;
   free(*a);
