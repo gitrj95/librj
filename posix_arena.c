@@ -1,8 +1,8 @@
 /*
   DANGER: As far as the C standard is concerned, this implementation
-  is UB. Practically, if the system is POSIX and the uintptr_t
-  representation of an object pointer is precisely its address, then
-  it is "safe".
+  is UB. If the system is POSIX and the uintptr_t representation of an
+  object pointer is precisely its address, then it is both correct and
+  non-portable.
 */
 
 #include <assert.h>
