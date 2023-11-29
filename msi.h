@@ -4,8 +4,8 @@
   provides a sequence of indices into [0, n) given some hash and n as
   some power of 2. The generated sequence has some useful
   properties. First, as the step is odd and the input is assumed a
-  power of 2, they are coprime. Namely, all elements of [0, n) will be
-  touched exactly once in a sequence of indices of size n, after
+  power of 2, they are co-prime. Namely, all elements of [0, n) will
+  be touched exactly once in a sequence of indices of size n, after
   which, by the pigeonhole principle, we will have our first
   duplicate. Second, as the step size of the operation is both
   deterministic and derived from the hash, the generation of the
@@ -27,20 +27,12 @@
 #include <assert.h>
 #include <stdint.h>
 
-static inline int32_t msi_next(int exp, uint64_t hash, int32_t i) {
+static inline uint32_t msi(int exp, uint64_t hash, uint32_t i) {
   assert(-1 < exp);
   assert(31 > exp);
-  assert(-1 < i);
   uint32_t w = (1 << exp) - 1;
-  uint32_t step = (uint32_t)((hash >> 34) >> (30 - exp)) | 1; /* same... */
+  uint32_t step = (uint32_t)((hash >> 34) >> (30 - exp)) | 1;
   return (i + step) & w;
-}
-
-static inline int32_t msi_init(int exp, uint64_t hash) {
-  return msi_next(
-      exp, hash,
-      (int32_t)(hash & 0x3fffffff)); /* some implementations can't figure out
-                                        that it's guaranteed to fit... */
 }
 
 #endif
