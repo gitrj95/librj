@@ -19,9 +19,12 @@ void createndelete(void) {
   expect_abort(arena_delete(&a));
 }
 
+int freecnt;
+
 void myfree(void *p, ptrdiff_t len) {
   (void)len;
   free(p);
+  ++freecnt;
 }
 
 void create3ndelete(void) {
@@ -36,6 +39,7 @@ void create3ndelete(void) {
   expect_true(a->tl > (char *)n);
   *n = 123;
   arena_delete(&a);
+  expect_true(1 == freecnt);
   a = arena_create(PTRDIFF_MAX);
   expect_true(!a);
   expect_abort(arena_create3(0, 1, myfree));
