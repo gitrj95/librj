@@ -14,7 +14,7 @@ uint64_t hash(uint64_t x) {
 void init(void) {
   test();
   uint64_t h = hash(12);
-  int32_t i = msi(EXP, h, (uint32_t)h);
+  uint32_t i = msi(EXP, h, (uint32_t)h);
   expect_true(0 < i);
   expect_true(i < 1 << EXP);
   i = msi(EXP, UINT64_MAX, UINT32_MAX);
@@ -25,6 +25,12 @@ void init(void) {
   expect_true(i < 1 << EXP);
   i = msi(0, h, (uint32_t)h);
   expect_true(!i);
+  expect_abort(msi(33, h, (uint32_t)h));
+  (void)msi(32, h, (uint32_t)h);
+  pass("Maximum exponent");
+  i = msi(0, h, (uint32_t)h);
+  expect_true(!msi(0, h, i));
+  expect_abort(msi(-1, 0, 0));
 }
 
 void walk(void) {
@@ -42,10 +48,6 @@ void walk(void) {
   expect_true(count == 1 << EXP);
   for (int k = 0; k < (1 << EXP); ++k) assert(1 == seen[k]);
   pass("Domain exhausted");
-  i = msi(0, h, (uint32_t)h);
-  expect_true(!msi(0, h, i));
-  expect_abort(msi(-1, 0, 0));
-  expect_abort(msi(32, 0, 0));
 }
 
 int main(void) {
