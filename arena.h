@@ -18,9 +18,10 @@
 typedef struct arena arena;
 
 arena *arena_create(ptrdiff_t len);
-arena *arena_create3(void *buf, ptrdiff_t buflen, void (*deleter)(void *, ptrdiff_t));
+arena *arena_create3(void *buf, ptrdiff_t buflen,
+                     void (*deleter)(void *, ptrdiff_t));
 int arena_delete(arena **a);
-void *linalloc_explicit(arena *a, ptrdiff_t itemsz, int align);
+[[gnu::malloc]] void *linalloc_explicit(arena *a, ptrdiff_t itemsz, int align);
 void arena_reset(arena *a);
 
 #endif
