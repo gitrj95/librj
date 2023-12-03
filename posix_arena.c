@@ -14,25 +14,28 @@
 #define unlikely(expr) __builtin_expect(!!(expr), 0)
 
 int arena_init(arena *a, ptrdiff_t len) {
+  assert(a);
   assert(0 < len);
   void *buf =
       mmap(0, len, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
   if (MAP_FAILED == buf) return -1;
-  return arena_init4(a, buf, len, 0);
+  return arena_init3(a, buf, len);
 }
 
-int arena_init4(arena *a, void *buf, ptrdiff_t buflen, arena_deleter deleter) {
+int arena_init3(arena *a, void *buf, ptrdiff_t buflen) {
+  assert(a);
   assert(buf);
   assert(0 < buflen);
-  *a = (arena){.hd = buf, .tl = (char *)buf + buflen, .deleter = deleter};
+  *a = (arena){.hd = buf, .tl = (char *)buf + buflen};
   return 0;
 }
 
-int arena_delete(arena *a) {
+int arena_delete(arena *a, ptrdiff_t len,
+                 int (*deleter)(void *, ptrdiff_t len)) {
   assert(a);
-  ptrdiff_t len = a->tl - a->hd;
-  if (a->deleter)
-    return a->deleter(a->hd, len);
+  assert(0 < len);
+  if (deleter)
+    return deleter(a->hd, len);
   else if (munmap(a->hd, len))
     return -1;
   *a = (arena){0};

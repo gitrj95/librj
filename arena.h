@@ -14,16 +14,13 @@
 
 #define linalloc(ap, T) linalloc_explicit((ap), sizeof(T), alignof(T))
 
-typedef int (*arena_deleter)(void *, ptrdiff_t);
-
 typedef struct {
   char *hd, *tl;
-  arena_deleter deleter;
 } arena;
 
 int arena_init(arena *a, ptrdiff_t len);
-int arena_init4(arena *a, void *buf, ptrdiff_t buflen, arena_deleter deleter);
+int arena_init3(arena *a, void *buf, ptrdiff_t buflen);
 [[gnu::malloc]] void *linalloc_explicit(arena *a, ptrdiff_t itemsz, int align);
-int arena_delete(arena *a);
+int arena_delete(arena *a, ptrdiff_t len, int (*deleter)(void *, ptrdiff_t));
 
 #endif
