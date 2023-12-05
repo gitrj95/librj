@@ -11,7 +11,8 @@
 #include <sys/mman.h>
 #include "arena.h"
 
-#define unlikely(expr) __builtin_expect(!!(expr), 0)
+#define unlikely(expr) \
+  __builtin_expect(!!(expr), 0) /* prefer speculative execution to cmov */
 
 int arena_init(arena *a, ptrdiff_t len) {
   assert(a);
@@ -33,6 +34,7 @@ int arena_init3(arena *a, void *buf, ptrdiff_t buflen) {
 int arena_delete(arena *a, ptrdiff_t len,
                  int (*deleter)(void *, ptrdiff_t len)) {
   assert(a);
+  assert(a->hd && a->tl);
   assert(0 < len);
   if (deleter)
     return deleter(a->hd, len);
@@ -50,9 +52,10 @@ void *linalloc_explicit(arena *a, ptrdiff_t itemsz, int align) {
   static_assert(sizeof(uintptr_t) >= sizeof(int));
   uintptr_t addr = (uintptr_t)a->tl;
   addr -= itemsz;
-  addr = addr & ~(align - 1); /* need sign extension */
-  if (unlikely(addr < (uintptr_t)a->hd))
-    return 0; /* prefer speculative execution to cmov */
+  addr = addr & ~(align - 1);             /* need sign extension */
+  if (unlikely(addr >= (uintptr_t)a->tl)) /* guard wrap */
+    return 0;
+  if (unlikely(addr < (uintptr_t)a->hd)) return 0;
   a->tl = (char *)addr;
   return a->tl;
 }

@@ -82,6 +82,16 @@ void alloc(void) {
   expect_abort(linalloc_explicit(&a, 10, 123));
   expect_abort(arena_delete(&a, -1, 0));
   arena_delete(&a, pagesz + 123, 0);
+  expect_abort(arena_delete(&a, 10, 0));
+}
+
+void hijack_alloc(void) {
+  test();
+  arena a;
+  a.hd = (char *)0;
+  a.tl = (char *)1;
+  int *p = linalloc(&a, int);
+  expect_true(!p);
 }
 
 int main(void) {
@@ -89,4 +99,5 @@ int main(void) {
   initndelete();
   init3ndelete();
   alloc();
+  hijack_alloc();
 }
