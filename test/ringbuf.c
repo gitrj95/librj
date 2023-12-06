@@ -34,10 +34,21 @@ void copy(void) {
   pass("copied buffer matches");
 }
 
+void destroy(void) {
+  test("destroy ring buffer");
+  ptrdiff_t pagesz = sysconf(_SC_PAGESIZE);
+  int *buf = ringbuf_create(pagesz);
+  die(ringbuf_destroy(0, pagesz), "null buffer");
+  die(ringbuf_destroy(buf, -pagesz), "negative length");
+  die(ringbuf_destroy(buf, 123), "length not a multiple of page size");
+  expect(!ringbuf_destroy(buf, pagesz), "successful destruction");
+}
+
 int main(void) {
   suite();
   bad_args();
   alloc();
   copy();
+  destroy();
   return 0;
 }

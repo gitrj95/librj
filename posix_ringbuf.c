@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <fcntl.h>
 #include <limits.h>
 #include <stdio.h>
 #include <sys/fcntl.h>
@@ -12,12 +11,14 @@
 #define SHMEM_NAME_MAX 10
 static_assert(SHMEM_NAME_MAX < INT_MAX);
 
+#define LENCHK(len) assert((len) > 0 && 0 == (len) % sysconf(_SC_PAGESIZE));
+
 #define PROT (PROT_READ | PROT_WRITE)
 #define FLAG (MAP_SHARED | MAP_FIXED)
 
 #define LOW(p, len) p
-#define MID(p, len) ((char *)(p) + len)
-#define HIGH(p, len) ((char *)(p) + 2 * len)
+#define MID(p, len) ((char *)(p) + (len))
+#define HIGH(p, len) ((char *)(p) + 2 * (len))
 
 static void fill_name(char *buf, int buflen) {
   FILE *f = fopen("/dev/urandom", "r");
@@ -27,7 +28,7 @@ static void fill_name(char *buf, int buflen) {
   fclose(f);
 }
 
-static int get_shmem(char *name, ptrdiff_t len) {
+static int open_shmem(char *name, ptrdiff_t len) {
   int fd = shm_open(name, O_CREAT | O_RDWR | O_EXCL, 0600);
   if (-1 == fd) return -1;
   if (-1 == ftruncate(fd, len)) return -1;
@@ -49,13 +50,19 @@ static void alloc3(ptrdiff_t len, int shmem_fd, void **p) {
 }
 
 void *ringbuf_create(ptrdiff_t len) {
-  assert(0 == len % sysconf(_SC_PAGESIZE)); /* NOTE: handles negative `len' */
+  LENCHK(len);
   char name[SHMEM_NAME_MAX];
   fill_name(name, arraysize(name));
-  int fd = get_shmem(name, len);
+  int fd = open_shmem(name, len);
   if (0 > fd) return 0;
   void *p;
   alloc3(len, fd, &p);
   close(fd);
   return p;
+}
+
+int ringbuf_destroy(void *buf, ptrdiff_t len) {
+  assert(buf);
+  LENCHK(len);
+  return munmap((char *)buf - len, 3 * len);
 }
