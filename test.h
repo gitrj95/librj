@@ -1,30 +1,25 @@
 /*
-  A KISS unit testing helper header. Its semantics can be trivially
-  gleaned from examples, but n.b. One, the commands write to
-  stderr. Two, the commands write via `fprintf'; namely, they are not
-  re-entrant. Three, `expect_abort' works by jumping when a
-  SIGABRT is hit--e.g., via `assert'.
+  A KISS testing helper header for POSIX systems. It is reentrant,
+  supports terminal colors, and traps on failure. Executables using
+  this header can be easily run under gdb in both the death and
+  expected-value cases. lldb does not work reliably, however
+  (following forks in child processes does not work reliably in lldb).
 
-  Notably, there's no mocking support here, because mocking in C is
-  complicated to generally implement, and any such solution I know of
-  imposes restrictions on the mockable functions or exploits
-  non-trivial details of the toolchain/runtime. Examples: 1) poisoning
-  global offset table 2) textual replacement via unity build and some
-  statically known, global notion of mockable functions 3) weak
-  symbols via the linker, etc.
-
-  Therefore, if mocking is required, I think a non-generic solution
-  for the specific context is more useful.
+  The API is trivial and may be gleaned from examples, and the string
+  "keys" make it harder to semantically duplicate test cases.
 */
 
 #ifndef TEST_H
 #define TEST_H
 
 #include <assert.h>
-#include <setjmp.h>
-#include <signal.h>
 #include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #if NCOLOR
 #define KNRM ""
@@ -40,40 +35,56 @@
 #define KYEL "\x1B[33m"
 #endif
 
-#define suite() fprintf(stderr, "%sSuite: %s%s\n", KCYN, __FILE__, KNRM)
-#define test() fprintf(stderr, "%sTest: %s%s\n", KYEL, __func__, KNRM)
-#define pass(str) fprintf(stderr, "  %sPass: %s%s\n", KGRN, (str), KNRM)
-#define fail(str) \
-  (fprintf(stderr, "  %sFail: %s\n%s", KRED, (str), KNRM), __builtin_trap())
+#define INVALID_POSIX_RC UINT8_MAX
 
-#define expect_true(expr) \
-  do {                    \
-    bool cond__ = (expr); \
-    if (cond__)           \
-      pass(#expr);        \
-    else                  \
-      fail(#expr);        \
+#define pr(fd, fmt, clr)                                                   \
+  do {                                                                     \
+    char buf__[BUFSIZ];                                                    \
+    ptrdiff_t len__ = snprintf(buf__, BUFSIZ, "%s" fmt "%s\n", clr, KNRM); \
+    write((fd), buf__, len__);                                             \
   } while (0)
 
-#define expect_abort(expr)                         \
-  do {                                             \
-    void (*old__)(int) = signal(SIGABRT, unwind_); \
-    if (!setjmp(frame_)) (void)(expr);             \
-    if (fail_)                                     \
-      pass(#expr);                                 \
-    else                                           \
-      fail(#expr);                                 \
-    fail_ = 0;                                     \
-    signal(SIGABRT, old__);                        \
+#define suite()                                  \
+  do {                                           \
+    setvbuf(stdout, 0, _IONBF, BUFSIZ);          \
+    setvbuf(stderr, 0, _IONBF, BUFSIZ);          \
+    pr(STDOUT_FILENO, "Suite: " __FILE__, KCYN); \
   } while (0)
 
-sig_atomic_t volatile fail_;
-jmp_buf frame_;
+#define test(slit) pr(STDOUT_FILENO, " Test: " slit, KYEL)
+#define pass(slit) pr(STDOUT_FILENO, "  Pass: " slit, KGRN)
+#define fail(slit) pr(STDERR_FILENO, "  Fail: " slit, KRED)
+#define trap() __builtin_trap()
 
-void unwind_(int sig) {
-  assert(SIGABRT == sig);
-  fail_ = 1;
-  longjmp(frame_, 1);
-}
+#define expect(expr, slit) \
+  do {                     \
+    bool cond__ = (expr);  \
+    if (cond__)            \
+      pass(slit);          \
+    else {                 \
+      fail(slit);          \
+      trap();              \
+    }                      \
+  } while (0)
+
+#define die(expr, slit)                        \
+  do {                                         \
+    pid_t chld__;                              \
+    int rc__ = -1;                             \
+    if (-1 == (chld__ = fork()))               \
+      fail("fork failed: " slit);              \
+    else if (!chld__) {                        \
+      (void)(expr);                            \
+      exit(INVALID_POSIX_RC);                  \
+    } else                                     \
+      waitpid(chld__, &rc__, 0);               \
+    assert(-1 != rc__);                        \
+    if (INVALID_POSIX_RC != WEXITSTATUS(rc__)) \
+      pass(slit);                              \
+    else {                                     \
+      fail(slit);                              \
+      trap();                                  \
+    }                                          \
+  } while (0)
 
 #endif

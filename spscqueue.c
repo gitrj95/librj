@@ -3,7 +3,6 @@
 #include <stdatomic.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdlib.h>
 #include <string.h>
 
 void spscqueue_init(spscqueue *restrict q, void *buf, ptrdiff_t buflen,
@@ -14,6 +13,7 @@ void spscqueue_init(spscqueue *restrict q, void *buf, ptrdiff_t buflen,
   assert(1 < buflen);
   assert(0 < itemsz);
   assert(!(buflen % itemsz));
+  assert(1 < buflen / itemsz);
   char *tl = (char *)buf + buflen;
   *q = (spscqueue){.itemsz = itemsz,
                    .hd = buf,

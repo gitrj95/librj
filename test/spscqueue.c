@@ -37,48 +37,51 @@ void *consume(void *ctx) {
 }
 
 void init(void) {
-  test();
+  test("initialization");
   spscqueue q0, q1;
   int a[1000] = {0};
   spscqueue_init2(&q0, a);
-  expect_true(sizeof(a) == (char *)q0.tl - (char *)q0.hd);
+  expect(sizeof(a) == (char *)q0.tl - (char *)q0.hd,
+         "head and tail pointers spaced by the length of the static buffer");
   float *f = malloc(1000 * sizeof(*f));
   spscqueue_init(&q1, f, 1000, sizeof(*f));
-  expect_true(sizeof(a) == (char *)q0.tl - (char *)q0.hd);
+  expect(sizeof(a) == (char *)q0.tl - (char *)q0.hd,
+         "head and tail pointers spaced by the length of the dynamic buffer");
   free(f);
-  expect_abort(spscqueue_init(0, a, 20, 10));
-  expect_abort(spscqueue_init(&q0, 0, 20, 10));
-  expect_abort(spscqueue_init(&q0, a, 0, 10));
-  expect_abort(spscqueue_init(&q0, a, 20, 0));
-  expect_abort(spscqueue_init(&q0, a + 19, 3, 0));
-  expect_abort(spscqueue_init(&q0, a, 1000, 99));
-  expect_abort(spscqueue_init(&q0, a, 1, sizeof(*f)));
+  die(spscqueue_init(0, a, 20, 10), "null `q'");
+  die(spscqueue_init(&q0, 0, 20, 10), "null input buffer");
+  die(spscqueue_init(&q0, a, 0, 10), "zero buffer length");
+  die(spscqueue_init(&q0, a, 20, 0), "zero item size");
+  die(spscqueue_init(&q0, a, 1000, 99),
+      "buffer length not a multiple of item size");
+  die(spscqueue_init(&q0, a, sizeof(*f), sizeof(*f)),
+      "buffer holds exactly one item");
 }
 
 void trypush(void) {
-  test();
+  test("writer");
   spscqueue q;
   int a[2] = {0};
   spscqueue_init2(&q, a);
   int ins = 11;
-  expect_true(spscqueue_trypush(&q, &ins));
-  expect_true(!spscqueue_trypush(&q, &ins));
-  expect_abort(spscqueue_trypush(0, &ins));
-  expect_abort(spscqueue_trypush(&q, 0));
+  expect(spscqueue_trypush(&q, &ins), "happy-path push");
+  expect(!spscqueue_trypush(&q, &ins), "push does not clobber reader's slot");
+  die(spscqueue_trypush(0, &ins), "null `q'");
+  die(spscqueue_trypush(&q, 0), "null value to write");
 }
 
 void trypop(void) {
-  test();
+  test("reader");
   spscqueue q;
   int a[10000] = {0};
   spscqueue_init2(&q, a);
   int ins = 11;
   spscqueue_trypush(&q, &ins);
   void const *top;
-  expect_true((top = spscqueue_trypop(&q)));
-  expect_true(ins == *(int const *)top);
-  expect_true(!spscqueue_trypop(&q));
-  expect_abort(spscqueue_trypop(0));
+  expect((top = spscqueue_trypop(&q)), "happy-path pop");
+  expect(ins == *(int const *)top, "value popped matches written value");
+  expect(!spscqueue_trypop(&q), "pop does not clobber writer's slot");
+  die(spscqueue_trypop(0), "null `q'");
 }
 
 void mintnrun_thrds(int pspin, int cspin) {

@@ -23,7 +23,7 @@ int im_lazy(int nthreads) {
 }
 
 void sum(void) {
-  test();
+  test("linearized access");
   pthread_t t1, t2;
   spinlock mtx = SPINLOCK_INIT;
   pthread_create(&t1, 0, add, &mtx);
@@ -31,7 +31,7 @@ void sum(void) {
   add(&mtx);
   pthread_join(t1, 0);
   pthread_join(t2, 0);
-  expect_true(im_lazy(3) == non_atomic);
+  expect(im_lazy(3) == non_atomic, "non-atomic counter incremented race-free");
 }
 
 int main(void) {

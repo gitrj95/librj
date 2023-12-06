@@ -12,29 +12,26 @@ uint64_t hash(uint64_t x) {
 }
 
 void init(void) {
-  test();
+  test("set of first calls to msi");
   uint64_t h = hash(12);
-  uint32_t i = msi(EXP, h, (uint32_t)h);
-  expect_true(0 < i);
-  expect_true(i < 1 << EXP);
+  uint32_t j = (uint32_t)h, i = msi(EXP, h, j);
+  expect(i != j, "index minted by msi different from seed");
+  expect(i < 1 << EXP, "index bounded above by 1 << `EXP'");
   i = msi(EXP, UINT64_MAX, UINT32_MAX);
-  expect_true(0 < i);
-  expect_true(i < 1 << EXP);
+  expect(i < 1 << EXP, "index from maximal hash and index valid");
   i = msi(EXP, 0, 0);
-  expect_true(0 < i);
-  expect_true(i < 1 << EXP);
+  expect(i < 1 << EXP, "index from minimal hash and index valid");
+  i = msi(0, h, j);
+  expect(!i, "zero index on singleton array");
+  die(msi(33, h, j), "`exp' above valid range");
+  (void)msi(32, h, j);
+  pass("maximum exponent");
   i = msi(0, h, (uint32_t)h);
-  expect_true(!i);
-  expect_abort(msi(33, h, (uint32_t)h));
-  (void)msi(32, h, (uint32_t)h);
-  pass("Maximum exponent");
-  i = msi(0, h, (uint32_t)h);
-  expect_true(!msi(0, h, i));
-  expect_abort(msi(-1, 0, 0));
+  die(msi(-1, 0, 0), "negative `exp'");
 }
 
 void walk(void) {
-  test();
+  test("walk set of minted msi sequence");
   int seen[1 << EXP] = {0};
   uint64_t h = hash(12);
   uint32_t j, i;
@@ -45,9 +42,9 @@ void walk(void) {
     seen[i] += 1;
     ++count;
   } while (j != (i = msi(EXP, h, i)));
-  expect_true(count == 1 << EXP);
+  expect(count == 1 << EXP, "msi sequence of maximal size");
   for (int k = 0; k < (1 << EXP); ++k) assert(1 == seen[k]);
-  pass("Domain exhausted");
+  pass("domain exhausted");
 }
 
 int main(void) {
