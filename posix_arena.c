@@ -12,7 +12,7 @@
 #include "arena.h"
 
 #define unlikely(expr) \
-  __builtin_expect(!!(expr), 0) /* prefer speculative execution to cmov */
+  __builtin_expect(!!(expr), 0) /* NOTE: prefer speculative execution to cmov */
 
 int arena_init(arena *a, ptrdiff_t len) {
   assert(a);
@@ -52,8 +52,8 @@ void *linalloc_explicit(arena *a, ptrdiff_t itemsz, int align) {
   static_assert(sizeof(uintptr_t) >= sizeof(int));
   uintptr_t addr = (uintptr_t)a->tl;
   addr -= itemsz;
-  addr = addr & ~(align - 1);             /* need sign extension */
-  if (unlikely(addr >= (uintptr_t)a->tl)) /* guard wrap */
+  addr = addr & ~(align - 1);             /* NOTE: need sign extension */
+  if (unlikely(addr >= (uintptr_t)a->tl)) /* NOTE: guard wrap */
     return 0;
   if (unlikely(addr < (uintptr_t)a->hd)) return 0;
   a->tl = (char *)addr;

@@ -69,6 +69,7 @@
 #define spscqueue_init2(qp, a) \
   spscqueue_init((qp), (a), sizeof(a), sizeof((a)[0]))
 
+/* TODO: pointers to integers to allow easy shmem usage */
 typedef struct {
   ptrdiff_t itemsz;
   void *hd, *tl;
