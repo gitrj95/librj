@@ -101,7 +101,7 @@ void mintnrun_thrds(int pspin, int cspin) {
 }
 
 void pushnpop(void) {
-  test();
+  test("race-free with differing push/pop rates");
   mintnrun_thrds(0, 0);
   pass("Zero-latency SPSC");
   mintnrun_thrds(0, 10000);
