@@ -11,21 +11,18 @@
 #define SHMEM_NAME_MAX 10
 static_assert(SHMEM_NAME_MAX < INT_MAX);
 
-#define LENCHK(len) assert((len) > 0 && 0 == (len) % sysconf(_SC_PAGESIZE));
-
 #define PROT (PROT_READ | PROT_WRITE)
 #define FLAG (MAP_SHARED | MAP_FIXED)
 
-#define LOW(p, len) p
-#define MID(p, len) ((char *)(p) + (len))
-#define HIGH(p, len) ((char *)(p) + 2 * (len))
-
-static void fill_name(char *buf, int buflen) {
+static int fill_name(char *buf, int buflen) {
   FILE *f = fopen("/dev/urandom", "r");
   assert(f);
-  ptrdiff_t read = fread(buf, sizeof(char), -1 + buflen, f);
+  ptrdiff_t read = fread(buf, sizeof(char), --buflen, f);
+  if (feof(f) || ferror(f)) return -1;
+  assert(read == buflen);
   buf[read] = 0;
   fclose(f);
+  return 0;
 }
 
 static int open_shmem(char *name, ptrdiff_t len) {
@@ -35,24 +32,39 @@ static int open_shmem(char *name, ptrdiff_t len) {
   return fd;
 }
 
+static void *offsetn(void *p, ptrdiff_t len, int n) {
+  return (char *)p + n * len;
+}
+
 static void alloc3(ptrdiff_t len, int shmem_fd, void **p) {
-  void *base = mmap(0, 3 * len, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-  void *low = mmap(LOW(base, len), len, PROT, FLAG, shmem_fd, 0);
-  assert(low == base);
-  void *mid = mmap(MID(base, len), len, PROT, FLAG, shmem_fd, 0);
-  void *high = mmap(HIGH(base, len), len, PROT, FLAG, shmem_fd, 0);
-#define _(p) (MAP_FAILED == (p))
-  if (0 == _(low) + _(mid) + _(high))
-#undef _
-    *p = mid;
-  else
-    *p = 0;
+  void *base = mmap(0, 3 * len, PROT, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+#define F(p) (MAP_FAILED == (p))
+  if (F(base)) goto FAIL;
+  void *low = mmap(base, len, PROT, FLAG, shmem_fd, 0);
+  assert(low == base); /* no need for `F(low)' here */
+  void *mid = mmap(offsetn(low, len, 1), len, PROT, FLAG, shmem_fd, 0);
+  if (F(mid)) goto FAIL_LOW;
+  void *high = mmap(offsetn(base, len, 2), len, PROT, FLAG, shmem_fd, 0);
+  if (F(high)) goto FAIL_MID;
+#undef F
+  *p = mid;
+  return;
+FAIL_MID:
+  munmap(mid, len);
+FAIL_LOW:
+  munmap(low, len);
+FAIL:
+  *p = 0;
+}
+
+static bool lenchk(ptrdiff_t len) {
+  return len > 0 && 0 == len % sysconf(_SC_PAGESIZE);
 }
 
 void *ringbuf_create(ptrdiff_t len) {
-  LENCHK(len);
+  assert(lenchk(len));
   char name[SHMEM_NAME_MAX];
-  fill_name(name, arraysize(name));
+  if (0 > fill_name(name, arraysize(name))) return 0;
   int fd = open_shmem(name, len);
   if (0 > fd) return 0;
   void *p;
@@ -63,6 +75,6 @@ void *ringbuf_create(ptrdiff_t len) {
 
 int ringbuf_destroy(void *buf, ptrdiff_t len) {
   assert(buf);
-  LENCHK(len);
-  return munmap((char *)buf - len, 3 * len);
+  assert(lenchk(len));
+  return munmap(offsetn(buf, len, -1), 3 * len);
 }
