@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <limits.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <sys/fcntl.h>
 #include <sys/mman.h>
