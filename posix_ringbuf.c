@@ -42,7 +42,7 @@ static void alloc3(ptrdiff_t len, int shmem_fd, void **p) {
 #define F(p) (MAP_FAILED == (p))
   if (F(base)) goto FAIL;
   void *low = mmap(base, len, PROT, FLAG, shmem_fd, 0);
-  assert(low == base); /* no need for `F(low)' here */
+  assert(low == base); /* NOTE: no need for `F(low)' here */
   void *mid = mmap(offsetn(low, len, 1), len, PROT, FLAG, shmem_fd, 0);
   if (F(mid)) goto FAIL_LOW;
   void *high = mmap(offsetn(base, len, 2), len, PROT, FLAG, shmem_fd, 0);
