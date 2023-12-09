@@ -1,11 +1,11 @@
 /*
-  Exploit the VM-subsystem to provide a pointer that acts like an
+  Exploit the VM subsystem to provide a pointer that acts like an
   array but feels like a ring buffer. Namely, operations like copying
   from [-5..2] should work seamlessly. e.g. buf[-1] should give the
   value in the last slot.
 
   This is particularly useful because the prototypical structure of
-  page tables and the VM-subsystem essentially grants this capability
+  page tables and the VM subsystem essentially grants this capability
   for free. The OOP style of constructing a ring buffer as some
   wrapper type with modulo to access elements given some index has
   major optimization disadvantages. By synthesizing a contiguous

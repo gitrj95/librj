@@ -3,6 +3,9 @@
   is UB. If the system is POSIX and the uintptr_t representation of an
   object pointer is precisely its address, then it is both correct and
   non-portable.
+
+  N.b.: tooling normally traces memory manager subroutines, but not
+  `mmap'. Pass a malloc'd buffer into `arena_init3' to make use of it.
 */
 
 #include <assert.h>
@@ -12,7 +15,7 @@
 #include "arena.h"
 
 #define unlikely(expr) \
-  __builtin_expect(!!(expr), 0) /* NOTE: prefer speculative execution to cmov */
+  __builtin_expect(!!(expr), 0) /* NOTE: prefer spec exec to cmov */
 
 int arena_init(arena *a, ptrdiff_t len) {
   assert(a);
