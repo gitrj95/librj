@@ -6,7 +6,7 @@ STD = gnu2x
 NCOLOR = 0
 DELIM = echo "~~"
 ASAN = -fsanitize=address
-UBSAN = -fsanitize=undefined
+UBSAN = -fsanitize=undefined -fsanitize-trap
 TSAN = -fsanitize=thread
 CFLAGS = -std=$(STD) -Wall -Wextra -Wconversion -Wno-sign-conversion -Wdouble-promotion -Wcast-qual -Wvla -Werror -pedantic -O0 -g3 -DNCOLOR=$(NCOLOR)
 LDFLAGS = -Wl,-pie
