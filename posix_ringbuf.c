@@ -77,12 +77,8 @@ CLEANUP_low:
   return 0;
 }
 
-static bool lenchk(ptrdiff_t len) {
-  return len > 0 && 0 == len % sysconf(_SC_PAGESIZE);
-}
-
 void *ringbuf_create(ptrdiff_t len) {
-  assert(lenchk(len));
+  assert(0 < len);
   void *p = 0;
   char name[SHMEM_NAMESZ];
   FILE *f = fopen(RAND_SEED_FILENAME, "rb");
@@ -104,6 +100,6 @@ CLEANUP_f:
 
 int ringbuf_destroy(void *buf, ptrdiff_t len) {
   assert(buf);
-  assert(lenchk(len));
+  assert(0 < len);
   return munmap(offsetn(buf, len, -1), 3 * len);
 }

@@ -8,7 +8,6 @@
 void bad_args(void) {
   test("strange arguments");
   die(ringbuf_create(-1), "negative length");
-  die(ringbuf_create(123), "length not a multiple of page size");
 }
 
 void name_gen(void) {
@@ -25,13 +24,15 @@ void name_gen(void) {
   expect(arraysize(buf) - 1 == strlen(name), "maximal length given arguments");
   expect(arraysize(buf) - 2 == strspn(name + 1, alphabet),
          "fully from alphabet");
-  die(fill_name(buf, arraysize(buf), ")", 1, f), "illegal `/' in alphabet");
+  die(fill_name(buf, arraysize(buf), ")", 1, f), "alphabet at least 1");
+  die(fill_name(buf, arraysize(buf), "/1", 1, f), "no `/' in alphabet");
 }
 
 void shmem(void) {
   test("shared memory");
   die(open_shmem(0, 2), "null name");
   die(open_shmem("/asd", -1), "negative len");
+  die(open_shmem("asd", 2), "name[0] is not `/'");
   die(open_shmem("//", 2), "duplicate `/'");
 }
 
@@ -67,7 +68,6 @@ void destroy(void) {
   int *buf = ringbuf_create(pagesz);
   die(ringbuf_destroy(0, pagesz), "null buffer");
   die(ringbuf_destroy(buf, -pagesz), "negative length");
-  die(ringbuf_destroy(buf, 123), "length not a multiple of page size");
   expect(!ringbuf_destroy(buf, pagesz), "successful destruction");
 }
 
