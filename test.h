@@ -44,13 +44,7 @@
     write((fd), buf__, len__);                                             \
   } while (0)
 
-#define suite()                                  \
-  do {                                           \
-    setvbuf(stdout, 0, _IONBF, BUFSIZ);          \
-    setvbuf(stderr, 0, _IONBF, BUFSIZ);          \
-    pr(STDOUT_FILENO, "Suite: " __FILE__, KCYN); \
-  } while (0)
-
+#define suite() pr(STDOUT_FILENO, "Suite: " __FILE__, KCYN)
 #define test(slit) pr(STDOUT_FILENO, " Test: " slit, KYEL)
 #define pass(slit) pr(STDOUT_FILENO, "  Pass: " slit, KGRN)
 #define fail(slit) pr(STDERR_FILENO, "  Fail: " slit, KRED)

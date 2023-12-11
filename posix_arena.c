@@ -1,10 +1,10 @@
 /*
-  DANGER: As far as the C standard is concerned, this implementation
+  NOTE: as far as the C standard is concerned, this implementation
   is UB. If the system is POSIX and the uintptr_t representation of an
   object pointer is precisely its address, then it is both correct and
   non-portable.
 
-  N.b.: tooling normally traces memory manager subroutines, but not
+  NOTE: tooling normally traces memory manager subroutines but not
   `mmap'. Pass a malloc'd buffer into `arena_init3' to make use of it.
 */
 

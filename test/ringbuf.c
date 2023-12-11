@@ -1,6 +1,7 @@
-#include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include "../arraysize.h"
 #include "../posix_ringbuf.c"
 #include "../test.h"
 
@@ -8,6 +9,30 @@ void bad_args(void) {
   test("strange arguments");
   die(ringbuf_create(-1), "negative length");
   die(ringbuf_create(123), "length not a multiple of page size");
+}
+
+void name_gen(void) {
+  test("name generation invariants");
+  FILE *f = fopen("name_gen.etc", "wb+");
+  assert(f);
+  char buf[100];
+  fwrite(buf, sizeof(char), arraysize(buf), f);
+  rewind(f);
+  char alphabet[] = "wijlk6)"; /* NOTE: lazy removal of nul */
+  char name[arraysize(buf)];
+  fill_name(name, arraysize(buf), alphabet, arraysize(alphabet) - 1, f);
+  expect('/' == name[0], "first char is `/'");
+  expect(arraysize(buf) - 1 == strlen(name), "maximal length given arguments");
+  expect(arraysize(buf) - 2 == strspn(name + 1, alphabet),
+         "fully from alphabet");
+  die(fill_name(buf, arraysize(buf), ")", 1, f), "illegal `/' in alphabet");
+}
+
+void shmem(void) {
+  test("shared memory");
+  die(open_shmem(0, 2), "null name");
+  die(open_shmem("/asd", -1), "negative len");
+  die(open_shmem("//", 2), "duplicate `/'");
 }
 
 void alloc(void) {
@@ -47,6 +72,8 @@ void destroy(void) {
 int main(void) {
   suite();
   bad_args();
+  name_gen();
+  shmem();
   alloc();
   copy();
   destroy();
