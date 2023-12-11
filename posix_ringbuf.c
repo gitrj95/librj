@@ -57,6 +57,8 @@ static void *offsetn(void *p, ptrdiff_t len, int n) {
 }
 
 static void *alloc3(ptrdiff_t len, int shmem_fd) {
+  assert(0 < len);
+  assert(-1 < shmem_fd);
   void *base = mmap(0, 3 * len, PROT, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 #define F(p) (MAP_FAILED == (p))
   if (F(base)) return 0;

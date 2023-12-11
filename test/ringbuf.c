@@ -37,6 +37,8 @@ void shmem(void) {
 
 void alloc(void) {
   test("ring buffer allocations");
+  die(alloc3(0, 1), "negative length");
+  die(alloc3(1, -1), "negative fd");
   ptrdiff_t pagesz = sysconf(_SC_PAGESIZE);
   int *buf = ringbuf_create(pagesz);
   expect(buf, "allocate a ring buffer");
