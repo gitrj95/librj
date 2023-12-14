@@ -11,7 +11,7 @@ TSAN = -fsanitize=thread
 CFLAGS = -std=$(STD) -Wall -Wextra -Wconversion -Wno-sign-conversion -Wdouble-promotion -Wcast-qual -Wvla -Werror -pedantic -O0 -g3 -DNCOLOR=$(NCOLOR)
 LDFLAGS = -Wl,-pie
 
-check: test_arena test_spscqueue test_spinlock test_msi test_arraysize test_ringbuf
+check: test_arena test_spinlock test_msi test_arraysize test_ringbuf
 
 test_arena: arena
 	@$(DELIM)
@@ -20,20 +20,6 @@ test_arena: arena
 
 arena: arena.c .force
 	$(CC) -o $@ $(CFLAGS) $(ASAN) $(UBSAN) $< $(LDFLAGS)
-
-test_spscqueue: spscqueue_tsan spscqueue_asan
-	@$(DELIM)
-	@echo "[Under TSan]"
-	@./spscqueue_tsan
-	@echo "[Under ASan/UBSan]"
-	@./spscqueue_asan
-	@$(DELIM)
-
-spscqueue_tsan: spscqueue.c .force
-	$(CC) -o $@ $(CFLAGS) $(TSAN) $< $(LDFLAGS) -lpthread
-
-spscqueue_asan: spscqueue.c .force
-	$(CC) -o $@ $(CFLAGS) $(ASAN) $(UBSAN) $< $(LDFLAGS) -lpthread
 
 test_spinlock: spinlock_tsan spinlock_asan
 	@$(DELIM)
