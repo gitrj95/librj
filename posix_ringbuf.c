@@ -6,13 +6,13 @@
 
 #include <assert.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include "arraysize.h"
 #include "ringbuf.h"
 
 #define RAND_SEED_FILENAME "/dev/urandom"
@@ -21,6 +21,8 @@
 
 #define PROT (PROT_READ | PROT_WRITE)
 #define FLAG (MAP_SHARED | MAP_FIXED)
+
+#define arraysize(a) ((ptrdiff_t)(sizeof(a) / sizeof((a)[0])))
 
 static int fill_name(char *buf, int bufcnt, char *alphabet, int alphabetcnt,
                      FILE *f) {

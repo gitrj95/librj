@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include "../arraysize.h"
 #include "../posix_ringbuf.c"
 #include "../test.h"
 
