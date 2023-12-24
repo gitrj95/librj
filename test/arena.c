@@ -11,7 +11,7 @@ void initndelete(void) {
   arena a;
   expect(!arena_init(&a, 123), "happy-path initialization");
   expect(a.hd < a.tl, "head address below its tail address");
-  expect(!((uintptr_t)a.hd % sysconf(_SC_PAGESIZE)),
+  expect(!((uintptr_t)a.hd % sysconf(_SC_PAGE_SIZE)),
          "head address aligned to page");
   arena_delete(&a, 123, 0);
   expect(!a.hd && !a.tl, "head and tail members zeroed");
@@ -64,7 +64,7 @@ void alloc(void) {
   k = linalloc(&a, int);
   expect(!k, "null when arena exhausted");
   arena_delete(&a, 123, 0);
-  int pagesz = (int)sysconf(_SC_PAGESIZE);
+  int pagesz = (int)sysconf(_SC_PAGE_SIZE);
   arena_init(&a, pagesz + 123);
   expect(!((uintptr_t)a.hd % pagesz), "head pointer aligned to page boundary");
   float *f = linalloc_explicit(&a, sizeof(*f), pagesz);

@@ -6,9 +6,10 @@
   we have two states (0 or 1 WLOG). The nanosleep is a heuristic hack
   sourced from Fedor Pikus. Without the sleep, the OS would think that
   the waiter of a lock is doing lots of work, so it would give it more
-  time slices erroneously. The nanosleep with the pursuant magic
-  numbers deals with this in practice on modern x86 machines and is
-  more portable than threads.h.
+  time slices erroneously. Namely, a hardware `PAUSE' wouldn't
+  necessarily inform the kernel.
+
+  Spinlocks also compose nicely with other concurrency structures.
 */
 
 #ifndef SPINLOCK_H

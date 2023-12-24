@@ -29,8 +29,14 @@
 #define RINGBUF_H
 
 #include <stddef.h>
+#include <stdbool.h>
 
-void *ringbuf_create(ptrdiff_t len);
-int ringbuf_destroy(void *buf, ptrdiff_t len);
+struct ringbuf {
+  void *p;
+  ptrdiff_t nitems;
+};
+
+bool ringbuf_create(struct ringbuf *rb, ptrdiff_t itemsz, ptrdiff_t minitems);
+bool ringbuf_destroy(struct ringbuf rb, ptrdiff_t itemsz);
 
 #endif

@@ -15,29 +15,34 @@
 #include <unistd.h>
 #include "ringbuf.h"
 
-#define RAND_SEED_FILENAME "/dev/urandom"
-#define SHMEM_NAMESZ 10
-#define RETRY_MAX 3
-
-#define PROT (PROT_READ | PROT_WRITE)
-#define FLAG (MAP_SHARED | MAP_FIXED)
+#define SHMEM_SEED_FILENAME "/dev/urandom"
+#define SHMEM_NAME_LEN 10
+#define SHMEM_RETRY_MAX 10
 
 #define arraysize(a) ((ptrdiff_t)(sizeof(a) / sizeof((a)[0])))
 
-static int fill_name(char *buf, int bufcnt, char *alphabet, int alphabetcnt,
-                     FILE *f) {
-  assert(buf);
-  assert(1 < bufcnt);
-  assert(alphabet);
-  assert(1 < alphabetcnt);
-  for (int i = 0; i < alphabetcnt; ++i) assert('/' != alphabet[i]);
+static ptrdiff_t get_padding(ptrdiff_t itemsz, ptrdiff_t nitems) {
+  assert(0 < itemsz);
+  assert(0 < nitems);
+  ptrdiff_t pagesz = sysconf(_SC_PAGE_SIZE);
+  assert(0 == pagesz % itemsz);
+  assert(0 == (pagesz & (pagesz - 1)));
+  size_t usize = itemsz * nitems;
+  return -usize & (pagesz - 1); /* NOTE: relies on two's complement */
+}
+
+static int fill_name(char *name, int namelen, char *alphabet,
+                     ptrdiff_t alphabetlen, FILE *f) {
+  assert(name);
+  assert(1 < namelen);
   assert(f);
-  *buf++ = '/';
-  --bufcnt;
-  buf[fread(buf, sizeof(char), --bufcnt, f)] = 0;
+  for (int i = 0; i < alphabetlen; ++i) assert('/' != alphabet[i]);
+  *name++ = '/';
+  --namelen;
+  name[fread(name, sizeof(char), --namelen, f)] = 0;
   if (ferror(f)) return -1;
-  for (int i = 0; i < bufcnt; ++i)
-    buf[i] = alphabet[(unsigned char)buf[i] % alphabetcnt];
+  for (int i = 0; i < namelen; ++i)
+    name[i] = alphabet[(unsigned char)name[i] % alphabetlen];
   return 0;
 }
 
@@ -55,53 +60,76 @@ static int open_shmem(char *name, ptrdiff_t len) {
 }
 
 static void *offsetn(void *p, ptrdiff_t len, int n) {
+  assert(p);
+  assert(0 < len);
   return (char *)p + n * len;
 }
 
-static void *alloc3(ptrdiff_t len, int shmem_fd) {
+static void *allocblock(void *base, ptrdiff_t len, int off, int shmem_fd) {
+  assert(base);
   assert(0 < len);
   assert(-1 < shmem_fd);
-  void *base = mmap(0, 3 * len, PROT, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-#define F(p) (MAP_FAILED == (p))
-  if (F(base)) return 0;
-  void *low = mmap(base, len, PROT, FLAG, shmem_fd, 0);
-  assert(low == base); /* NOTE: no need for `F(low)' here */
-  void *mid = mmap(offsetn(low, len, 1), len, PROT, FLAG, shmem_fd, 0);
-  if (F(mid)) goto CLEANUP_low;
-  void *high = mmap(offsetn(base, len, 2), len, PROT, FLAG, shmem_fd, 0);
-  if (F(high)) goto CLEANUP_mid;
-#undef F
+  char *p = offsetn(base, len, off);
+  void *allocp =
+      mmap(p, len, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_FIXED, shmem_fd, 0);
+  if (MAP_FAILED == allocp) return 0;
+  if (base) assert(p == allocp);
+  return allocp;
+}
+
+static void *alloc3(ptrdiff_t blocklen, int shmem_fd) {
+  assert(0 < blocklen);
+  assert(-1 < shmem_fd);
+  void *base =
+      mmap(0, 3 * blocklen, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+  if (MAP_FAILED == base) return 0;
+  void *low = allocblock(base, blocklen, 0, shmem_fd);
+  if (!low) goto fail;
+  void *mid = allocblock(base, blocklen, 1, shmem_fd);
+  if (!mid) goto fail_low;
+  void *high = allocblock(base, blocklen, 2, shmem_fd);
+  if (!high) goto fail_mid;
   return mid;
-CLEANUP_mid:
-  munmap(mid, len);
-CLEANUP_low:
-  munmap(low, len);
+fail_mid:
+  munmap(mid, blocklen);
+fail_low:
+  munmap(low, blocklen);
+fail:
   return 0;
 }
 
-void *ringbuf_create(ptrdiff_t len) {
-  assert(0 < len);
-  void *p = 0;
-  char name[SHMEM_NAMESZ];
-  FILE *f = fopen(RAND_SEED_FILENAME, "rb");
+bool ringbuf_create(struct ringbuf *rb, ptrdiff_t itemsz, ptrdiff_t minitems) {
+  assert(rb);
+  assert(0 < itemsz);
+  assert(0 < minitems);
+  struct ringbuf ret = {0};
+  char name[SHMEM_NAME_LEN];
+  FILE *f = fopen(SHMEM_SEED_FILENAME, "rb");
   assert(f);
+  static char *alphabet = "abcde";
+  ptrdiff_t alphabetlen = strlen(alphabet);
+  ptrdiff_t padding = get_padding(itemsz, minitems);
+  ptrdiff_t alloclen = padding + itemsz * minitems;
+  ret.nitems = alloclen / itemsz;
   int fd = -1;
-  for (int i = 0; i < RETRY_MAX; ++i) {
-    static char al[] = {'a', 'b', 'c', 'd', 'e', '1', '2', '3', '4', '5'};
-    if (0 > fill_name(name, arraysize(name), al, arraysize(al), f))
-      goto CLEANUP_f;
-    if (-1 < (fd = open_shmem(name, len))) break;
+  for (int i = 0; i < SHMEM_RETRY_MAX; ++i) {
+    if (0 > fill_name(name, arraysize(name), alphabet, alphabetlen, f))
+      goto fail_f;
+    if (-1 < (fd = open_shmem(name, alloclen))) break;
   }
-  if (0 > fd) goto CLEANUP_f;
-  p = alloc3(len, fd);
+  if (0 > fd) goto fail_f;
+  ret.p = alloc3(alloclen, fd);
   close(fd);
-CLEANUP_f:
+fail_f:
   fclose(f);
-  return p;
+  *rb = ret;
+  return ret.p;
 }
 
-int ringbuf_destroy(void *buf, ptrdiff_t len) {
-  assert(buf);
-  assert(0 < len);
-  return munmap(offsetn(buf, len, -1), 3 * len);
+bool ringbuf_destroy(struct ringbuf rb, ptrdiff_t itemsz) {
+  assert(rb.p);
+  assert(0 < rb.nitems);
+  assert(0 < itemsz);
+  ptrdiff_t plen = itemsz * rb.nitems;
+  return !munmap(offsetn(rb.p, plen, -1), 3 * plen);
 }
