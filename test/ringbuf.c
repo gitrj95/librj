@@ -76,6 +76,8 @@ void allocwround(void) {
   for (int i = -1; i < 2; ++i)
     for (int j = 0; j < nitems; ++j) assert(j == buf[i * rb.nitems + j]);
   pass("negative and positive offsets back same buffer");
+  die(buf[-1 + -1 * rb.nitems] = 0, "guard prefix page inaccessible");
+  die(buf[2 * rb.nitems] = 0, "guard postfix page inaccessible");
 }
 
 void allocwslop(void) {

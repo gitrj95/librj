@@ -28,8 +28,8 @@
 #ifndef RINGBUF_H
 #define RINGBUF_H
 
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 struct ringbuf {
   void *p;

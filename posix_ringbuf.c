@@ -80,21 +80,22 @@ static void *allocblock(void *base, ptrdiff_t len, int off, int shmem_fd) {
 static void *alloc3(ptrdiff_t blocklen, int shmem_fd) {
   assert(0 < blocklen);
   assert(-1 < shmem_fd);
-  void *base =
-      mmap(0, 3 * blocklen, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+  ptrdiff_t pagesz = sysconf(_SC_PAGE_SIZE);
+  void *base = mmap(0, 3 * blocklen + 2 * pagesz, PROT_NONE,
+                    MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
   if (MAP_FAILED == base) return 0;
-  void *low = allocblock(base, blocklen, 0, shmem_fd);
-  if (!low) goto fail;
-  void *mid = allocblock(base, blocklen, 1, shmem_fd);
+  void *above_guard_pfx = (char *)base + pagesz;
+  void *low = allocblock(above_guard_pfx, blocklen, 0, shmem_fd);
+  if (!low) return 0;
+  void *mid = allocblock(above_guard_pfx, blocklen, 1, shmem_fd);
   if (!mid) goto fail_low;
-  void *high = allocblock(base, blocklen, 2, shmem_fd);
+  void *high = allocblock(above_guard_pfx, blocklen, 2, shmem_fd);
   if (!high) goto fail_mid;
   return mid;
 fail_mid:
   munmap(mid, blocklen);
 fail_low:
   munmap(low, blocklen);
-fail:
   return 0;
 }
 
@@ -131,5 +132,7 @@ bool ringbuf_destroy(struct ringbuf rb, ptrdiff_t itemsz) {
   assert(0 < rb.nitems);
   assert(0 < itemsz);
   ptrdiff_t plen = itemsz * rb.nitems;
-  return !munmap(offsetn(rb.p, plen, -1), 3 * plen);
+  ptrdiff_t pagesz = sysconf(_SC_PAGE_SIZE);
+  void *guard_pfx = (char *)offsetn(rb.p, plen, -1) - pagesz;
+  return !munmap(guard_pfx, 3 * plen + 2 * pagesz);
 }
