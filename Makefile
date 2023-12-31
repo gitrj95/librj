@@ -20,11 +20,8 @@ clean: .force
 	cd bin && rm -rf *
 	cd bin && touch .gitkeep
 
-bin/librj.a: bin/posix_arena.o bin/posix_ringbuf.o
-	ar $(ARFLAGS) $@ bin/posix_arena.o bin/posix_ringbuf.o
+bin/librj.a: bin/posix_arena.o
+	ar $(ARFLAGS) $@ bin/posix_arena.o
 
 bin/posix_arena.o: posix_arena.c arena.h
-	$(CC) -o $@ $(CFLAGS) -c $<
-
-bin/posix_ringbuf.o: posix_ringbuf.c ringbuf.h
 	$(CC) -o $@ $(CFLAGS) -c $<
