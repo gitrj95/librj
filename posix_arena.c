@@ -55,9 +55,8 @@ void *linalloc_explicit(arena *a, ptrdiff_t itemsz, int align) {
   static_assert(sizeof(uintptr_t) >= sizeof(int));
   uintptr_t addr = (uintptr_t)a->tl;
   addr -= itemsz;
-  addr = addr & ~(align - 1);             /* NOTE: need sign extension */
-  if (unlikely(addr >= (uintptr_t)a->tl)) /* NOTE: guard wrap */
-    return 0;
+  addr = addr & ~(align - 1); /* NOTE: need sign extension */
+  if (unlikely(addr >= (uintptr_t)a->tl)) return 0;
   if (unlikely(addr < (uintptr_t)a->hd)) return 0;
   a->tl = (char *)addr;
   return a->tl;
