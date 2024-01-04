@@ -34,7 +34,7 @@ void init3ndelete(void) {
   arena a;
   expect(!arena_init3(&a, buf, 123123), "happy-path initialization");
   expect(a.hd == buf, "head pointer is the base address of the buffer");
-  expect(a.hd + 123123 == a.tl,
+  expect((char *)a.hd + 123123 == a.tl,
          "tail pointer is exactly the buffer's length away");
   arena_delete(&a, 123123, myfree);
   expect(1 == freecnt, "free called exactly once");
@@ -52,8 +52,8 @@ void alloc(void) {
   int *n = linalloc(&a, int);
   expect(n, "non-zero pointer allocation");
   expect(!((uintptr_t)n % alignof(int)), "ensure pointer's aligned");
-  expect(a.hd < (char *)n, "head pointer below allocated pointer");
-  expect(a.tl == (char *)n, "tail pointer moves with latest allocation");
+  expect((int *)a.hd < n, "head pointer below allocated pointer");
+  expect((int *)a.tl == n, "tail pointer moves with latest allocation");
   *n = 123;
   int j;
   memcpy(&j, n, sizeof(int));

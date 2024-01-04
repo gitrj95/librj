@@ -15,7 +15,7 @@
 #define linalloc(ap, T) linalloc_explicit((ap), sizeof(T), alignof(T))
 
 typedef struct {
-  char *hd, *tl;
+  void *hd, *tl;
 } arena;
 
 int arena_init(arena *a, ptrdiff_t len);
