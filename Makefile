@@ -9,10 +9,6 @@ ARFLAGS = -rcs
 
 all: bin/librj.a
 
-tools: .force
-	ln -sf $(PWD)/compile_flags.txt $(HOME)/compile_flags.txt
-	ln -sf $(PWD)/.clang-format $(HOME)/.clang-format
-
 check: .force
 	@cd test && $(MAKE) NCOLOR=$(NCOLOR)
 
