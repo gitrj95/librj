@@ -13,7 +13,6 @@
 #define TEST_H
 
 #include <assert.h>
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -52,7 +51,7 @@
 
 #define expect(expr, slit) \
   do {                     \
-    bool cond__ = (expr);  \
+    _Bool cond__ = (expr); \
     if (cond__)            \
       pass(slit);          \
     else {                 \
