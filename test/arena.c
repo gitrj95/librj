@@ -16,8 +16,6 @@ void initndelete(void) {
   arena_delete(&a, 123, 0);
   expect(!a.hd && !a.tl, "head and tail members zeroed");
   die(arena_init(&a, -1), "negative arena length");
-  die(arena_delete(0, 1, 0), "null arena");
-  die(arena_init(0, 1), "null arena");
 }
 
 int freecnt;
@@ -40,9 +38,7 @@ void init3ndelete(void) {
   expect(1 == freecnt, "free called exactly once");
   expect(arena_init(&a, PTRDIFF_MAX),
          "fails initialization with sufficiently large length");
-  die(arena_init3(&a, 0, 1), "null buffer");
   die(arena_init3(&a, buf, 0), "zero buffer length");
-  die(arena_init3(0, buf, 1), "null arena pointer");
 }
 
 void alloc(void) {
@@ -73,7 +69,6 @@ void alloc(void) {
   f = linalloc_explicit(&a, sizeof(*f), (uint16_t)1 << 4);
   f = linalloc(&a, float);
   *f = 1000.f;
-  die(linalloc_explicit(0, 2, 2), "null arena");
   die(linalloc_explicit(&a, 0, 0), "zeroed item size");
   die(linalloc_explicit(&a, 10, -1), "negative alignment");
   die(linalloc_explicit(&a, 10, 123), "alignment not a power-of-2");

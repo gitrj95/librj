@@ -25,7 +25,6 @@
 typedef atomic_int spinlock;
 
 static inline void spin_lock(spinlock *lock) {
-  assert(lock);
   for (int i = 0; atomic_load_explicit(lock, memory_order_relaxed) ||
                   atomic_exchange_explicit(lock, 1, memory_order_acquire);
        ++i) {
@@ -38,7 +37,6 @@ static inline void spin_lock(spinlock *lock) {
 }
 
 static inline void spin_unlock(spinlock *lock) {
-  assert(lock);
   atomic_store_explicit(lock, 0, memory_order_release);
 }
 

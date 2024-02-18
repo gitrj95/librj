@@ -18,7 +18,6 @@
   __builtin_expect(!!(expr), 0) /* NOTE: prefer spec exec to cmov */
 
 int arena_init(arena *a, ptrdiff_t len) {
-  assert(a);
   assert(0 < len);
   void *buf =
       mmap(0, len, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -27,8 +26,6 @@ int arena_init(arena *a, ptrdiff_t len) {
 }
 
 int arena_init3(arena *a, void *buf, ptrdiff_t buflen) {
-  assert(a);
-  assert(buf);
   assert(0 < buflen);
   *a = (arena){.hd = buf, .tl = (char *)buf + buflen};
   return 0;
@@ -36,7 +33,6 @@ int arena_init3(arena *a, void *buf, ptrdiff_t buflen) {
 
 int arena_delete(arena *a, ptrdiff_t len,
                  int (*deleter)(void *, ptrdiff_t len)) {
-  assert(a);
   assert(a->hd && a->tl);
   assert(0 < len);
   if (deleter)
@@ -48,7 +44,6 @@ int arena_delete(arena *a, ptrdiff_t len,
 }
 
 void *linalloc_explicit(arena *a, ptrdiff_t itemsz, int align) {
-  assert(a);
   assert(0 < itemsz);
   assert(-1 < align);
   assert(!(align & (align - 1)));
