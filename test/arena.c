@@ -6,16 +6,16 @@
 #include "../posix_arena.c"
 #include "../test.h"
 
-void initndelete(void) {
+void createndelete(void) {
   test("initialize and delete arena");
   arena a;
-  expect(!arena_init(&a, 123), "happy-path initialization");
+  expect(!arena_create(&a, 123), "happy-path initialization");
   expect(a.hd < a.tl, "head address below its tail address");
   expect(!((uintptr_t)a.hd % sysconf(_SC_PAGE_SIZE)),
          "head address aligned to page");
   arena_delete(&a, 123, 0);
   expect(!a.hd && !a.tl, "head and tail members zeroed");
-  die(arena_init(&a, -1), "negative arena length");
+  die(arena_create(&a, -1), "negative arena length");
 }
 
 int freecnt;
@@ -26,25 +26,25 @@ int myfree(void *p, ptrdiff_t len) {
   return ++freecnt;
 }
 
-void init3ndelete(void) {
+void initndelete(void) {
   test("initialize and delete arena with user-defined buffer");
   void *buf = malloc(123123);
   arena a;
-  expect(!arena_init3(&a, buf, 123123), "happy-path initialization");
+  expect(!arena_init(&a, buf, 123123), "happy-path initialization");
   expect(a.hd == buf, "head pointer is the base address of the buffer");
   expect((char *)a.hd + 123123 == a.tl,
          "tail pointer is exactly the buffer's length away");
   arena_delete(&a, 123123, myfree);
   expect(1 == freecnt, "free called exactly once");
-  expect(arena_init(&a, PTRDIFF_MAX),
+  expect(arena_create(&a, PTRDIFF_MAX),
          "fails initialization with sufficiently large length");
-  die(arena_init3(&a, buf, 0), "zero buffer length");
+  die(arena_init(&a, buf, 0), "zero buffer length");
 }
 
 void alloc(void) {
   test("linear allocations");
   arena a;
-  arena_init(&a, 123);
+  arena_create(&a, 123);
   int *n = linalloc(&a, int);
   expect(n, "non-zero pointer allocation");
   expect(!((uintptr_t)n % alignof(int)), "ensure pointer's aligned");
@@ -61,7 +61,7 @@ void alloc(void) {
   expect(!k, "null when arena exhausted");
   arena_delete(&a, 123, 0);
   int pagesz = (int)sysconf(_SC_PAGE_SIZE);
-  arena_init(&a, pagesz + 123);
+  arena_create(&a, pagesz + 123);
   expect(!((uintptr_t)a.hd % pagesz), "head pointer aligned to page boundary");
   float *f = linalloc_explicit(&a, sizeof(*f), pagesz);
   expect(0 == (uintptr_t)f % pagesz,
@@ -74,7 +74,6 @@ void alloc(void) {
   die(linalloc_explicit(&a, 10, 123), "alignment not a power-of-2");
   die(arena_delete(&a, -1, 0), "negative length");
   arena_delete(&a, pagesz + 123, 0);
-  die(arena_delete(&a, 10, 0), "zeroed item size");
 }
 
 void hijack_alloc(void) {
@@ -88,8 +87,8 @@ void hijack_alloc(void) {
 
 int main(void) {
   suite();
+  createndelete();
   initndelete();
-  init3ndelete();
   alloc();
   hijack_alloc();
 }

@@ -1,11 +1,9 @@
 /*
-  NOTE: as far as the C standard is concerned, this implementation
-  is UB. If the system is POSIX and the uintptr_t representation of an
-  object pointer is precisely its address, then it is both correct and
-  non-portable.
+  NOTE: not portable. This requires POSIX, and the uintptr_t
+  representation of a pointer must be its address.
 
   NOTE: tooling normally traces memory manager subroutines but not
-  `mmap'. Pass a malloc'd buffer into `arena_init3' to make use of it.
+  `mmap'. Pass a malloc'd buffer into `arena_init' to make use of it.
 */
 
 #include <assert.h>
@@ -17,15 +15,15 @@
 #define unlikely(expr) \
   __builtin_expect(!!(expr), 0) /* NOTE: prefer spec exec to cmov */
 
-int arena_init(arena *a, ptrdiff_t len) {
+int arena_create(arena *a, ptrdiff_t len) {
   assert(0 < len);
   void *buf =
       mmap(0, len, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
   if (MAP_FAILED == buf) return -1;
-  return arena_init3(a, buf, len);
+  return arena_init(a, buf, len);
 }
 
-int arena_init3(arena *a, void *buf, ptrdiff_t buflen) {
+int arena_init(arena *a, void *buf, ptrdiff_t buflen) {
   assert(0 < buflen);
   *a = (arena){.hd = buf, .tl = (char *)buf + buflen};
   return 0;
@@ -33,7 +31,6 @@ int arena_init3(arena *a, void *buf, ptrdiff_t buflen) {
 
 int arena_delete(arena *a, ptrdiff_t len,
                  int (*deleter)(void *, ptrdiff_t len)) {
-  assert(a->hd && a->tl);
   assert(0 < len);
   if (deleter)
     return deleter(a->hd, len);
