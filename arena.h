@@ -20,7 +20,9 @@ typedef struct {
 
 int arena_create(arena *a, ptrdiff_t len);
 int arena_init(arena *a, void *buf, ptrdiff_t buflen);
-void *linalloc_explicit [[gnu::malloc]] (arena *a, ptrdiff_t itemsz, int align);
+void *linalloc_explicit
+    [[gnu::malloc, gnu::alloc_size(2),
+      gnu::alloc_align(3)]] (arena *a, ptrdiff_t itemsz, int align);
 int arena_delete(arena *a, ptrdiff_t len, int (*deleter)(void *, ptrdiff_t));
 
 #endif
