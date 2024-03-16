@@ -37,4 +37,5 @@ void sum(void) {
 int main(void) {
   suite();
   sum();
+  return 0;
 }

@@ -51,4 +51,5 @@ int main(void) {
   suite();
   init();
   walk();
+  return 0;
 }

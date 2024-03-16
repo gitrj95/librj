@@ -12,7 +12,7 @@
 
 #include <stddef.h>
 
-#define linalloc(a, T) (T *)linalloc_explicit((a), sizeof(T), alignof(T))
+#define linalloc(a, T) ((T *)linalloc_explicit((a), sizeof(T), alignof(T)))
 
 typedef struct {
   void *hd, *tl;

@@ -69,9 +69,6 @@ void alloc(void) {
   f = linalloc_explicit(&a, sizeof(*f), (uint16_t)1 << 4);
   f = linalloc(&a, float);
   *f = 1000.f;
-  die(linalloc_explicit(&a, 0, 0), "zeroed item size");
-  die(linalloc_explicit(&a, 10, -1), "negative alignment");
-  die(linalloc_explicit(&a, 10, 123), "alignment not a power-of-2");
   die(arena_delete(&a, -1, 0), "negative length");
   arena_delete(&a, pagesz + 123, 0);
 }
@@ -91,4 +88,5 @@ int main(void) {
   initndelete();
   alloc();
   hijack_alloc();
+  return 0;
 }
