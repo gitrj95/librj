@@ -40,7 +40,7 @@
   do {                                                                     \
     char buf__[BUFSIZ];                                                    \
     ptrdiff_t len__ = snprintf(buf__, BUFSIZ, "%s" fmt "%s\n", clr, KNRM); \
-    write((fd), buf__, len__);                                             \
+    assert(len__ == write((fd), buf__, len__));                            \
   } while (0)
 
 #define suite() pr(STDOUT_FILENO, "Suite: " __FILE__, KCYN)
