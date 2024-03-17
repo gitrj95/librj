@@ -54,7 +54,7 @@ void alloc(void) {
   int j;
   memcpy(&j, n, sizeof(int));
   expect(j == *n, "copied value matches dereferenced pointer");
-  int *k = linalloc_explicit(&a, sizeof(*k), 1 << 10);
+  int *k = linalloc_explicit(&a, sizeof *k, 1 << 10);
   expect(k, "non-zero explicit linear allocation");
   expect(0 == (uintptr_t)k % (1 << 10), "allocation suitably aligned");
   k = linalloc(&a, int);
@@ -63,10 +63,10 @@ void alloc(void) {
   int pagesz = (int)sysconf(_SC_PAGE_SIZE);
   arena_create(&a, pagesz + 123);
   expect(!((uintptr_t)a.hd % pagesz), "head pointer aligned to page boundary");
-  float *f = linalloc_explicit(&a, sizeof(*f), pagesz);
+  float *f = linalloc_explicit(&a, sizeof *f, pagesz);
   expect(0 == (uintptr_t)f % pagesz,
          "non-zero explicit linear allocation to page boundary");
-  f = linalloc_explicit(&a, sizeof(*f), (uint16_t)1 << 4);
+  f = linalloc_explicit(&a, sizeof *f, (uint16_t)1 << 4);
   f = linalloc(&a, float);
   *f = 1000.f;
   die(arena_delete(&a, -1, 0), "negative length");
