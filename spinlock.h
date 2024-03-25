@@ -23,20 +23,23 @@
 
 typedef atomic_int spinlock;
 
-static inline void spin_lock(spinlock *lock) {
-  for (int i = 0; atomic_load_explicit(lock, memory_order_relaxed) ||
-                  atomic_exchange_explicit(lock, 1, memory_order_acquire);
-       ++i) {
-    if (8 == i) {
-      static struct timespec ts = {.tv_sec = 0, .tv_nsec = 1};
-      nanosleep(&ts, 0);
+static inline void spin_lock( spinlock *lock )
+{
+  for( int i = 0;
+       atomic_load_explicit( lock, memory_order_relaxed ) ||
+       atomic_exchange_explicit( lock, 1, memory_order_acquire );
+       ++i ) {
+    if( 8 == i ) {
+      static struct timespec ts = { .tv_sec = 0, .tv_nsec = 1 };
+      nanosleep( &ts, 0 );
       i = 0;
     }
   }
 }
 
-static inline void spin_unlock(spinlock *lock) {
-  atomic_store_explicit(lock, 0, memory_order_release);
+static inline void spin_unlock( spinlock *lock )
+{
+  atomic_store_explicit( lock, 0, memory_order_release );
 }
 
 #endif

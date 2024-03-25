@@ -26,12 +26,13 @@
 #include <assert.h>
 #include <stdint.h>
 
-static inline uint32_t msi(short exp, uint64_t hash, uint32_t i) {
-  assert(-1 < exp);
-  assert(33 > exp);
-  uint32_t w = (uint32_t)((UINT64_C(1) << exp) - 1);
-  uint32_t step = (uint32_t)((hash >> 32) >> (32 - exp)) | 1;
-  return (i + step) & w;
+static inline uint32_t msi( short exp, uint64_t hash, uint32_t i )
+{
+  assert( -1 < exp );
+  assert( 33 > exp );
+  uint32_t w    = (uint32_t)( ( UINT64_C( 1 ) << exp ) - 1 );
+  uint32_t step = (uint32_t)( ( hash >> 32 ) >> ( 32 - exp ) ) | 1;
+  return ( i + step ) & w;
 }
 
 #endif
