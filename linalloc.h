@@ -3,10 +3,6 @@
 
 #include "base.h"
 
-struct arena {
-  void *hd, *tl;
-};
-
 #define LINALLOC( n )                                                \
   [[gnu::malloc]]                                                    \
   static inline void *linalloc##n( struct arena *a, long sz ) {      \
@@ -17,6 +13,10 @@ struct arena {
     a->tl = __builtin_assume_aligned( (void *)offs, n );             \
     return a->tl;                                                    \
   }
+
+struct arena {
+  void *hd, *tl;
+};
 
 LINALLOC( 1 )
 LINALLOC( 2 )
