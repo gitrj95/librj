@@ -1,12 +1,4 @@
 *~
 *#
 
-*.org
-
-bin/*
-!bin/.gitkeep
-
-test/*
-!test/Makefile
-!test/*.c
-!test/*.h
+.cache
