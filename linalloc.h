@@ -8,7 +8,7 @@ struct arena {
 };
 
 #define LINALLOC( n )                                                \
-  [[gnu::malloc, gnu::alloc_size( 2 )]]                              \
+  [[gnu::malloc]]                                                    \
   static inline void *linalloc##n( struct arena *a, long sz ) {      \
     ulong end  = (ulong)a->tl;                                       \
     ulong offs = end - sz;                                           \
