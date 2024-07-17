@@ -20,14 +20,10 @@ static_assert( sizeof( long ) == sizeof( size_t ) );
 static_assert( sizeof( long ) == sizeof( intptr_t ) );
 static_assert( sizeof( long ) == sizeof( ptrdiff_t ) );
 
-extern long  *d8__;
-extern int   *d4__;
-extern short *d2__;
-extern schar *d1__;
-
-static_assert( atomic_is_lock_free( d8__ ) );
-static_assert( atomic_is_lock_free( d4__ ) );
-static_assert( atomic_is_lock_free( d2__ ) );
-static_assert( atomic_is_lock_free( d1__ ) );
+static_assert( ATOMIC_POINTER_LOCK_FREE == 2 );
+static_assert( ATOMIC_LONG_LOCK_FREE == 2 );
+static_assert( ATOMIC_INT_LOCK_FREE == 2 );
+static_assert( ATOMIC_SHORT_LOCK_FREE == 2 );
+static_assert( ATOMIC_CHAR_LOCK_FREE == 2 );
 
 #endif
