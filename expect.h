@@ -1,6 +1,4 @@
-#ifndef EXPECT_H
-#define EXPECT_H
+#pragma once
 
-#define EXPECT( e ) while( !( e ) ) __builtin_unreachable()
-
-#endif
+#define EXPECT( e )                                                  \
+  while( !( e ) ) __builtin_unreachable()

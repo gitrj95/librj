@@ -1,5 +1,4 @@
-#ifndef BASE_H
-#define BASE_H
+#pragma once
 
 #include <assert.h>
 #include <stdatomic.h>
@@ -25,5 +24,3 @@ static_assert( ATOMIC_LONG_LOCK_FREE == 2 );
 static_assert( ATOMIC_INT_LOCK_FREE == 2 );
 static_assert( ATOMIC_SHORT_LOCK_FREE == 2 );
 static_assert( ATOMIC_CHAR_LOCK_FREE == 2 );
-
-#endif

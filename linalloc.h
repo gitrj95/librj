@@ -1,5 +1,4 @@
-#ifndef LINALLOC_H
-#define LINALLOC_H
+#pragma once
 
 #include "base.h"
 
@@ -26,5 +25,3 @@ LINALLOC( 16 )
 LINALLOC( 32 )
 LINALLOC( 64 )
 LINALLOC( 128 )
-
-#endif
