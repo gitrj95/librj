@@ -33,7 +33,7 @@ BreakBeforeBinaryOperators: None
 BreakBeforeInlineASMColon: OnlyMultiline
 BreakBeforeTernaryOperators: false
 BreakStringLiterals: true
-ColumnLimit: 70
+ColumnLimit: 80
 IndentWidth: 2
 DerivePointerAlignment: false
 IncludeBlocks: Merge  
