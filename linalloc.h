@@ -2,15 +2,15 @@
 
 #include "base.h"
 
-#define LINALLOC( n )                                                \
-  [[gnu::malloc]]                                                    \
-  static inline void *linalloc##n( struct arena *a, long sz ) {      \
-    ulong end  = (ulong)a->tl;                                       \
-    ulong offs = end - sz;                                           \
-    offs &= ~( n - 1 );                                              \
-    if( offs - (ulong)a->hd > end ) return 0;                        \
-    a->tl = __builtin_assume_aligned( (void *)offs, n );             \
-    return a->tl;                                                    \
+#define LINALLOC( n )                                                          \
+  [[gnu::malloc]]                                                              \
+  static inline void *linalloc##n( struct arena *a, long sz ) {                \
+    ulong end  = (ulong)a->tl;                                                 \
+    ulong offs = end - sz;                                                     \
+    offs &= ~( n - 1 );                                                        \
+    if( offs - (ulong)a->hd > end ) return 0;                                  \
+    a->tl = __builtin_assume_aligned( (void *)offs, n );                       \
+    return a->tl;                                                              \
   }
 
 struct arena {
