@@ -1,6 +1,7 @@
 #pragma once
 
 #include "base.h"
+#include "branch.h"
 
 #define LINALLOC( n )                                                          \
   [[gnu::malloc]]                                                              \
@@ -8,7 +9,7 @@
     ulong end  = (ulong)a->tl;                                                 \
     ulong offs = end - sz;                                                     \
     offs &= ~( n - 1 );                                                        \
-    if( offs - (ulong)a->hd > end ) return 0;                                  \
+    if( UNLIKELY( offs - (ulong)a->hd > end ) ) return 0;                      \
     a->tl = __builtin_assume_aligned( (void *)offs, n );                       \
     return a->tl;                                                              \
   }
