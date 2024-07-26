@@ -2,8 +2,8 @@
 
 #include "base.h"
 
-static inline uint msi( short lg, ulong h, uint i ) {
-  uint w    = ( 1 << lg ) - 1;
-  uint step = ( ( h >> 32 ) >> ( 32 - lg ) ) | 1;
-  return i + step & w;
+static inline int msi( int lg, ulong h, int i ) {
+  uint m = ( 1u << lg ) - 1;
+  uint s = ( h >> ( 64 - lg ) ) | 1;
+  return i + s & m;
 }
