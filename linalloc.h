@@ -6,10 +6,10 @@
 #define LINALLOC( n )                                                          \
   [[gnu::malloc]]                                                              \
   static inline void *linalloc##n( struct arena *a, long sz ) {                \
-    ulong end  = (ulong)a->tl;                                                 \
-    ulong offs = end - sz;                                                     \
+    ulong offs = (ulong)a->tl - sz;                                            \
     offs &= ~( n - 1 );                                                        \
-    if( UNLIKELY( offs - (ulong)a->hd > end ) ) return 0;                      \
+    if( UNLIKELY( offs - (ulong)a->hd > (ulong)a->tl - (ulong)a->hd ) )        \
+      return 0;                                                                \
     a->tl = __builtin_assume_aligned( (void *)offs, n );                       \
     return a->tl;                                                              \
   }
