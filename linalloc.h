@@ -1,15 +1,13 @@
 #pragma once
 
 #include "base.h"
-#include "branch.h"
 
 #define LINALLOC( n )                                                          \
   [[gnu::malloc]]                                                              \
   static inline void *linalloc##n( struct arena *a, long sz ) {                \
     ulong offs = (ulong)a->tl - sz;                                            \
     offs &= ~( n - 1 );                                                        \
-    if( UNLIKELY( offs - (ulong)a->hd > (ulong)a->tl - (ulong)a->hd ) )        \
-      return 0;                                                                \
+    if( offs - (ulong)a->hd > (ulong)a->tl - (ulong)a->hd ) return 0;          \
     a->tl = __builtin_assume_aligned( (void *)offs, n );                       \
     return a->tl;                                                              \
   }
