@@ -2,7 +2,7 @@
 
 #define S8( s ) { s, sizeof s - 1 }
 
-struct s8 {
+typedef struct {
   char const *s;
   long        len;
-};
+} s8_t;
