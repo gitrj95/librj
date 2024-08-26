@@ -5,4 +5,4 @@
 typedef struct {
   char const *s;
   long        len;
-} s8;
+} s8_t;
