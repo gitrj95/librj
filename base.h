@@ -1,6 +1,7 @@
 #pragma once
 
 #include <assert.h>
+#include <limits.h>
 #include <stdatomic.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -10,6 +11,8 @@ typedef unsigned int   uint;
 typedef unsigned short ushort;
 typedef unsigned char  uchar;
 typedef signed char    schar;
+
+static_assert( CHAR_BIT == 8 );
 
 static_assert( sizeof( long ) == 8 );
 static_assert( sizeof( int ) == 4 );
