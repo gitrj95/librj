@@ -1,4 +1,5 @@
-#pragma once
+#ifndef LIBRJ_LINALLOC_H
+#define LIBRJ_LINALLOC_H
 
 #include "base.h"
 
@@ -24,3 +25,5 @@ LINALLOC( 16 )
 LINALLOC( 32 )
 LINALLOC( 64 )
 LINALLOC( 128 )
+
+#endif
