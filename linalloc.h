@@ -5,7 +5,7 @@
 
 #define LINALLOC( n )                                                          \
   [[gnu::malloc]]                                                              \
-  static inline void *linalloc##n( arena_t *a, long sz ) {                     \
+  static inline void *linalloc##n( struct arena *a, long sz ) {                \
     ulong offs = (ulong)a->tl - sz;                                            \
     offs &= ~( n - 1 );                                                        \
     if( offs - (ulong)a->hd > (ulong)a->tl - (ulong)a->hd ) return 0;          \
@@ -13,9 +13,9 @@
     return a->tl;                                                              \
   }
 
-typedef struct {
+struct arena {
   void *hd, *tl;
-} arena_t;
+};
 
 LINALLOC( 1 )
 LINALLOC( 2 )

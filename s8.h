@@ -3,9 +3,9 @@
 
 #define S8( s ) { s, sizeof s - 1 }
 
-typedef struct {
+struct s8 {
   char const *s;
   long        len;
-} s8_t;
+};
 
 #endif
