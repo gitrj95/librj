@@ -19,9 +19,9 @@ static_assert( sizeof( long ) == 8 );
 static_assert( sizeof( int ) == 4 );
 static_assert( sizeof( short ) == 2 );
 
-static_assert( sizeof( long ) == sizeof( size_t ) );
-static_assert( sizeof( long ) == sizeof( intptr_t ) );
-static_assert( sizeof( long ) == sizeof( ptrdiff_t ) );
+static_assert( sizeof( long ) == sizeof( size_t ));
+static_assert( sizeof( long ) == sizeof( intptr_t ));
+static_assert( sizeof( long ) == sizeof( ptrdiff_t ));
 
 static_assert( ATOMIC_POINTER_LOCK_FREE == 2 );
 static_assert( ATOMIC_LONG_LOCK_FREE == 2 );
