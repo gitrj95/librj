@@ -1,4 +1,3 @@
-Language: Cpp
 BasedOnStyle: Google
 BreakBeforeBraces: Linux
 IndentWidth: 2
@@ -7,10 +6,12 @@ UseTab: Never
 ColumnLimit: 100
 ReflowComments: false
 PenaltyBreakComment: 1000000
+# Enforce braces around control statements
+InsertBraces: true  # Enforce braces around control statements
 # Spacing for parentheses
 SpaceBeforeParens: Never  # No space between if/for and opening parenthesis
-SpaceInEmptyParentheses: true
-SpacesInParentheses: true  # Space inside parentheses
+SpaceInEmptyParentheses: false  # No space inside empty parentheses
+SpacesInParentheses: true  # Space inside non-empty parentheses
 SpacesInSquareBrackets: true
 SpacesInAngles: true
 SpacesInCStyleCastParentheses: false  # No spaces in casts
@@ -25,10 +26,14 @@ SpaceBeforeInheritanceColon: true
 SpaceBeforeRangeBasedForLoopColon: true
 SpaceBeforeSquareBrackets: false
 SpacesBeforeTrailingComments: 1
+# Pointer settings
+PointerAlignment: Right  # East pointers (int *ptr)
+SpaceAroundPointerQualifiers: Before  # Space between pointer and left
 # Other formatting
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: None
+AllowShortBlocksOnASingleLine: false
 IndentCaseLabels: false
 NamespaceIndentation: None
 AccessModifierOffset: -2
@@ -38,7 +43,6 @@ AlignConsecutiveMacros: true
 AlignEscapedNewlines: Right
 AlignOperands: true
 AlignTrailingComments: true
-PointerAlignment: Right
 # Qualifier settings
 QualifierAlignment: Custom
 QualifierOrder: ['static', 'inline', 'constexpr', 'type', 'const', 'volatile', 'restrict']
