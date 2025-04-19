@@ -1,33 +1,21 @@
 #ifndef LIBRJ_LINALLOC_H
 #define LIBRJ_LINALLOC_H
 
-#include "base.h"
-
-#ifndef __SANITIZE_ADDRESS__
-
-#define LINALLOC( n )                                                                              \
-  [[gnu::malloc]]                                                                                  \
-  static inline void *linalloc##n( struct arena *a, long sz )                                      \
-  {                                                                                                \
-    ulong offs = (ulong)a->tl - sz;                                                                \
-    offs &= ~( n - 1 );                                                                            \
-    if( offs - (ulong)a->hd > (ulong)a->tl - (ulong)a->hd ) {                                      \
-      return 0;                                                                                    \
-    };                                                                                             \
-    a->tl = __builtin_assume_aligned( (void *)offs, n );                                           \
-    return a->tl;                                                                                  \
-  }
-
-#else
-
 #include <sanitizer/asan_interface.h>
 
+#include "base.h"
+
+#if __has_feature( address_sanitizer )
+#define __LIBRJ_LINALLOC_REDZONE_LEN 16
+#else
+#define __LIBRJ_LINALLOC_REDZONE_LEN 0
+#endif
+
 #define LINALLOC( n )                                                                              \
   [[gnu::malloc]]                                                                                  \
   static inline void *linalloc##n( struct arena *a, long sz )                                      \
   {                                                                                                \
-    sz += 16;                                                                                      \
-    ulong offs = (ulong)a->tl - sz;                                                                \
+    ulong offs = (ulong)a->tl - sz - __LIBRJ_LINALLOC_REDZONE_LEN;                                 \
     offs &= ~( n - 1 );                                                                            \
     if( offs - (ulong)a->hd > (ulong)a->tl - (ulong)a->hd ) {                                      \
       return 0;                                                                                    \
@@ -36,8 +24,6 @@
     a->tl = __builtin_assume_aligned( (void *)offs, n );                                           \
     return a->tl;                                                                                  \
   }
-
-#endif
 
 struct arena {
   void *hd, *tl;
