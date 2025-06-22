@@ -16,7 +16,7 @@
   {                                                                  \
     long hd = (long)a->hd;                                           \
     long tl = (long)a->tl;                                           \
-    long pad = -hd & (n) - 1;                                        \
+    long pad = -hd & ((n) - 1);                                      \
     long avail = tl - hd - pad;                                      \
                                                                      \
     if (unlikely(avail < 0)) {                                       \
