@@ -6,7 +6,7 @@
 #define unlikely(e) __builtin_expect(!!(e), 0)
 
 #if __has_feature(address_sanitizer)
-#define __LIBRJ_LINALLOC_REDZONE_LEN alignof(max_align_t)
+#define __LIBRJ_LINALLOC_REDZONE_LEN (alignof(max_align_t))
 #else
 #define __LIBRJ_LINALLOC_REDZONE_LEN 0
 #endif
