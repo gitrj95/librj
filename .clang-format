@@ -1,7 +1,8 @@
 BasedOnStyle: Google
 BreakBeforeBraces: Linux
-ReflowComments: false
-PenaltyBreakComment: 1000000
 InsertBraces: true
+ReflowComments: false
+PenaltyBreakComment: 1000
+QualifierAlignment: Right
 PointerAlignment: Right
 SpaceAroundPointerQualifiers: Before
