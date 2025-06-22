@@ -1,48 +1,7 @@
 BasedOnStyle: Google
 BreakBeforeBraces: Linux
-IndentWidth: 2
-TabWidth: 2
-UseTab: Never
-ColumnLimit: 100
 ReflowComments: false
 PenaltyBreakComment: 1000000
-# Enforce braces around control statements
-InsertBraces: true  # Enforce braces around control statements
-# Spacing for parentheses
-SpaceBeforeParens: Never  # No space between if/for and opening parenthesis
-SpaceInEmptyParentheses: false  # No space inside empty parentheses
-SpacesInParentheses: true  # Space inside non-empty parentheses
-SpacesInSquareBrackets: true
-SpacesInAngles: true
-SpacesInCStyleCastParentheses: false  # No spaces in casts
-SpacesInContainerLiterals: true
-# Additional spacing settings
-SpaceAfterCStyleCast: false  # No space after casts
-SpaceAfterLogicalNot: false
-SpaceBeforeAssignmentOperators: true
-SpaceBeforeCpp11BracedList: true
-SpaceBeforeCtorInitializerColon: true
-SpaceBeforeInheritanceColon: true
-SpaceBeforeRangeBasedForLoopColon: true
-SpaceBeforeSquareBrackets: false
-SpacesBeforeTrailingComments: 1
-# Pointer settings
-PointerAlignment: Right  # East pointers (int *ptr)
-SpaceAroundPointerQualifiers: Before  # Space between pointer and left
-# Other formatting
-AllowShortIfStatementsOnASingleLine: false
-AllowShortLoopsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: None
-AllowShortBlocksOnASingleLine: false
-IndentCaseLabels: false
-NamespaceIndentation: None
-AccessModifierOffset: -2
-AlignConsecutiveAssignments: true
-AlignConsecutiveDeclarations: true
-AlignConsecutiveMacros: true
-AlignEscapedNewlines: Right
-AlignOperands: true
-AlignTrailingComments: true
-# Qualifier settings
-QualifierAlignment: Custom
-QualifierOrder: ['static', 'inline', 'constexpr', 'type', 'const', 'volatile', 'restrict']
+InsertBraces: true
+PointerAlignment: Right
+SpaceAroundPointerQualifiers: Before
