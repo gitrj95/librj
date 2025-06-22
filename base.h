@@ -1,10 +1,8 @@
 #ifndef LIBRJ_BASE_H
 #define LIBRJ_BASE_H
 
-#include <assert.h>
 #include <limits.h>
 #include <stdatomic.h>
-#include <stddef.h>
 #include <stdint.h>
 
 static_assert(CHAR_BIT == 8);
