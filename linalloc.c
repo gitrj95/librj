@@ -12,14 +12,13 @@
 #endif
 
 #define IMPL(n)                                                      \
-  void *linalloc##n(struct arena *a, long sz)                        \
+  [[gnu::malloc]] void *linalloc##n(struct arena *a, long sz)        \
   {                                                                  \
     long hd = (long)a->hd;                                           \
     long tl = (long)a->tl;                                           \
     long pad = -hd & ((n) - 1);                                      \
-    long avail = tl - hd - pad;                                      \
-                                                                     \
-    if (unlikely(avail < 0)) {                                       \
+    long avail = tl - hd - pad - __LIBRJ_LINALLOC_REDZONE_LEN;       \
+    if (unlikely(avail < 0 || sz > avail)) {                         \
       return 0;                                                      \
     }                                                                \
     char *p = (char *)hd + pad;                                      \

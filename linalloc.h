@@ -1,7 +1,7 @@
 #ifndef LIBRJ_LINALLOC_H
 #define LIBRJ_LINALLOC_H
 
-#define LINALLOC(n) [[gnu::malloc]] void *linalloc##n(struct arena *a, long sz);
+#define LINALLOC(n) void *linalloc##n(struct arena *a, long sz);
 
 struct arena {
   void *hd, *tl;
