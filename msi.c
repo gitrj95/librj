@@ -1,8 +1,8 @@
 #include "msi.h"
 
-long msi(int lg, unsigned long hash, long index)
+int msi(int lg, unsigned long hash, int index)
 {
-  long mask = (1ul << lg) - 1;
-  long stride = (hash >> (64 - lg)) | 1;
+  unsigned mask = (1u << lg) - 1;
+  unsigned stride = (hash >> (64 - lg)) | 1;
   return (index + stride) & mask;
 }
