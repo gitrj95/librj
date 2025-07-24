@@ -4,4 +4,4 @@ InsertBraces: true
 ReflowComments: false
 QualifierAlignment: Right
 PointerAlignment: Right
-SpaceAroundPointerQualifiers: Before
+SpaceAroundPointerQualifiers: Default
