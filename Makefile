@@ -1,7 +1,7 @@
 .POSIX:
 .SUFFIXES:.c .o
 
-OBJ=linalloc.o msi.o
+OBJ=msi.o
 
 lib/librj.a: $(OBJ)
 	$(AR) $(ARFLAGS) $@ $(OBJ)
