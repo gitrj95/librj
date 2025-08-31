@@ -1,3 +1,5 @@
+/* Save some bullshit */
+
 #ifndef LIBRJ_BASE_H
 #define LIBRJ_BASE_H
 
